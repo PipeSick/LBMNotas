@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace LBMNotas.Models
 {
@@ -6,12 +7,13 @@ namespace LBMNotas.Models
     {
         public int Id { get; set; }
         [Required(ErrorMessage ="El Email es Obligatorio")]
-        public string? Correo { get; set; }
-        [Required]
-        public string? Contraseña { get; set; }
-        [Required]
+        public string Nombre { get; set; }
+        public string Rut { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsActive { get; set; }
+
+        public string UserId { get; set; }
+        public IdentityUser User { get; set; }
         public List<ProfesorAsignatura>? ProfesoresAsignaturas { get; set; }
     }
 }
