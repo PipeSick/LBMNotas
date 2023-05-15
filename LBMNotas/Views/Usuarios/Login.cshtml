@@ -6,27 +6,47 @@
 
 <link rel="stylesheet" href="/css/LoginStyle.css" />
 
+
 <div class="wrapper">
+    @if (ViewData.Keys.Contains("mensaje"))
+    {
+        <p style="color:red">
+            @ViewData["mensaje"]
+        </p>
+        
+    }
+
     <div class="logo">
-        <img src="https://www.freepnglogos.com/uploads/twitter-logo-png/twitter-bird-symbols-png-logo-0.png" alt="">
+        <img src="/Images/lbm.jpeg" alt="">
     </div>
     <div class="text-center mt-4 name">
-        Twitter
+        Liceo Bicentenario Molina
     </div>
-    <form class="p-3 mt-3">
-        <div class="form-field d-flex align-items-center">
+    <form asp-action="Login" class="p-3 mt-3">
+        
+        <div class="mb-3">
             <span class="far fa-user"></span>
-            <input asp-for="Email" name="userName" id="userName" placeholder="Correo">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
         </div>
-        <div class="form-field d-flex align-items-center">
+        <div class="mb-3">
             <span class="fas fa-key"></span>
-            <input asp-for="Password" type="password" name="password" id="pwd" placeholder="Contraseña">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-        <button class="btn mt-3">Login</button>
+        <div class="form-fiel">
+            <input class="form-check-input" type="checkbox" asp-for="RememberMe" />
+            <label class="form-check-label" asp-for="RememberMe"></label>
+        </div>
+        <button class="btn mt-3">Iniciar Sesión</button>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <a class="btn btn-success" asp-action="LoginExterno" asp-route-proveedor="Google">
+            Continuar con google
+        </a>
     </form>
-    <div class="text-center fs-6">
-        <a href="#">Forget password?</a> or <a href="#">Sign up</a>
-    </div>
+
 </div>
 @section Scripts{
 	<partial name="_ValidationScriptsPartial" />

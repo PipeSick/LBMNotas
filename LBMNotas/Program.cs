@@ -17,7 +17,11 @@ builder.Services.AddControllersWithViews( opciones =>
     opciones.Filters.Add(new AuthorizeFilter(politicaUsuariosAutenticados));
 });
 builder.Services.AddDbContext<ApplicationDbContext>(opciones => opciones.UseSqlServer("Name=DefaultConnection"));
-builder.Services.AddAuthentication();
+builder.Services.AddAuthentication().AddGoogle(opciones =>
+{
+    opciones.ClientId = builder.Configuration["GoogleClientId"];
+    opciones.ClientSecret = builder.Configuration["GoogleSecretId"];
+});
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opciones =>
 {
     opciones.SignIn.RequireConfirmedAccount = false;
