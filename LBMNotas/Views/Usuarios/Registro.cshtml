@@ -4,12 +4,22 @@
     ViewData["Title"] = "Registro";
 }
 
-<h1> Agregar Usuario</h1>
 
-<div class="card">
-    <div class="card-body">
+
+<div class="container d-flex justify-content-center align-items-center">
+
+<div class="card w-75">
+        <div class="card-header d-flex justify-content-center align-items-center bg-primary text-white ">
+            <h2>Agregar Usuario</h2>
+    </div>
+    <div class="card-body ">
         <form asp-action="Registro">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div cite="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"/>
+            </div>
             <div class="mb-3">
                 <label asp-for="Email" class="form-label"></label>
                 <input asp-for="Email" class="form-control"/>
@@ -21,8 +31,19 @@
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger" />
             </div>
+            <div class="mb-3">
+                <label  class="form-label"></label>
+                <select class="form-select" aria-label="Selecciona el rol">
+                    <option value="admin">Administrador</option>
+                    <option value="profesor">Profesor</option>
+                </select>
+            </div>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary">Agregar Usuario</button>
+                </div>
         </form>
     </div>
+</div>
 </div>
 
 @section Scripts{

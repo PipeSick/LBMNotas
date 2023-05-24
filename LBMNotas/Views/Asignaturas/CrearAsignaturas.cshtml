@@ -1,0 +1,114 @@
+﻿@model AsignaturaCreateViewModel
+
+@{
+    ViewData["Title"] = "CrearAsignaturas";
+
+    if (Model.Unidades == null)
+    {
+        Model.Unidades = new List<Unidades>();
+    }
+}
+
+
+@using (Html.BeginForm("CrearAsignaturas", "Asignaturas", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
+{
+    <h4>Agregar Nueva Asignatura</h4>
+    <hr />
+    <div class="container">
+        <!-- Resto del código de la vista -->
+        <div class="form-group">
+            <label asp-for="nombreasignatura" class="control-label"></label>
+            <input asp-for="nombreasignatura" class="form-control" />
+            <span asp-validation-for="nombreasignatura" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input asp-for="CursoId" value="@Model.CursoId" hidden>
+        </div>
+
+        <h3 class="mt-4">Unidades:</h3>
+        <div id="unidadesContainer">
+            @for (int i = 0; i < Model.Unidades.Count; i++)            {
+                <div class="unidad mb-3">
+                    <label for="unidad-@i" class="form-label">Nombre de la unidad:</label>
+                    <input type="text" name="Unidades[@i].Nombre" class="form-control" id="unidad-@i" required="required" />
+                    <div class="invalid-feedback">Por favor, ingresa el nombre de la unidad.</div>
+
+                    <label for="descripcion-@i" class="form-label">Descripción de la unidad:</label>
+                    <textarea name="Unidades[@i].Descripcion" class="form-control" id="descripcion-@i"></textarea>
+
+                    @for (int j = 0; j < Model.Unidades[i].Etapas.Count; j++)
+                    {
+                        <div class="etapa mb-3">
+                            <label for="etapa-@i-@j" class="form-label">Nombre de la etapa:</label>
+                            <input type="text" name="Unidades[@i].Etapas[@j].Nombre" class="form-control" id="etapa-@i-@j" required="required" />
+                            <div class="invalid-feedback">Por favor, ingresa el nombre de la etapa.</div>
+
+                            <label for="porcentaje-@i-@j" class="form-label">Porcentaje de la etapa:</label>
+                            <input type="number" name="Unidades[@i].Etapas[@j].Porcentaje" class="form-control" id="porcentaje-@i-@j" required="required" />
+                        </div>
+
+                    }
+
+                    <button type="button" class="agregarEtapaBtn btn btn-secondary mt-2" data-unidad-index="@i">Agregar etapa</button>
+                    <button type="button" class="eliminarUnidadBtn btn btn-danger mt-2" data-unidad-index="@i">Eliminar unidad</button>
+                </div>
+            }
+        </div>
+
+        <button type="button" id="agregarUnidadBtn" class="btn btn-primary mt-2">Agregar unidad</button>
+
+        <!-- Resto del código de la vista -->
+
+        <button class="btn btn-primary">Guardar Asignatura.</button>
+    </div>
+}
+
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        var unidadIndex = @Model.Unidades.Count;
+
+        function agregarUnidad() {
+            var unidadHtml = `<div class="unidad mb-3">
+                                <label for="unidad-${unidadIndex}" class="form-label">Nombre de la unidad:</label>
+                                <input type="text" name="Unidades[${unidadIndex}].Nombre" class="form-control" id="unidad-${unidadIndex}" required="required" />
+                                <div class="invalid-feedback">Por favor, ingresa el nombre de la unidad.</div>
+                                <label for="descripcion-${unidadIndex}" class="form-label">Descripción de la unidad:</label>
+                                <textarea name="Unidades[${unidadIndex}].Descripcion" class="form-control" id="descripcion-${unidadIndex}"></textarea>
+                                <button type="button" class="agregarEtapaBtn btn btn-secondary mt-2" data-unidad-index="${unidadIndex}">Agregar etapa</button>
+                                <button type="button" class="eliminarUnidadBtn btn btn-danger mt-2">Eliminar unidad</button>
+                              </div>`;
+
+            $("#unidadesContainer").append(unidadHtml);
+            unidadIndex++;
+        }
+
+        function agregarEtapa(event) {
+            var unidadIndex = $(event.target).data("unidad-index");
+            var etapaIndex = $(`.unidad:eq(${unidadIndex}) .etapa`).length;
+
+            var etapaHtml = `<div class="etapa mb-3">
+                                <label for="etapa-${unidadIndex}-${etapaIndex}" class="form-label">Nombre de la etapa:</label>
+                                <input type="text" name="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Nombre" class="form-control" id="etapa-${unidadIndex}-${etapaIndex}" required="required" />
+                                <div class="invalid-feedback">Por favor, ingresa el nombre de la etapa.</div>
+                                <label for="porcentaje-${unidadIndex}-${etapaIndex}" class="form-label">Porcentaje de la etapa:</label>
+                                <input type="number" name="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Porcentaje" class="form-control" id="porcentaje-${unidadIndex}-${etapaIndex}" required="required" />
+                              </div>`;
+
+            $(event.target).before(etapaHtml);
+        }
+
+        function eliminarUnidad(event) {
+            $(event.target).closest(".unidad").remove();
+        }
+
+        $(document).ready(function () {
+            $("#agregarUnidadBtn").click(agregarUnidad);
+            $(document).on("click", ".agregarEtapaBtn", agregarEtapa);
+            $(document).on("click", ".eliminarUnidadBtn", eliminarUnidad);
+        });
+    </script>
+}
+

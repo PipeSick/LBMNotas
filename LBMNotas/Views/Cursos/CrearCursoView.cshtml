@@ -1,0 +1,144 @@
+﻿@model LBMNotas.Models.Cursos
+
+@{
+    ViewData["Title"] = "CrearCursoView";
+}
+
+
+<h4>Agregar Cursos</h4>
+<hr />
+<div class="row">
+    <form asp-action="CrearCurso" enctype="multipart/form-data">
+    <div class="col-md-4">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Nombre" class="control-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Año" class="control-label"></label>
+                <input asp-for="Año" class="form-control" />
+                <span asp-validation-for="Año" class="text-danger"></span>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Volver al listado</a>
+                </div>
+                <div class="col ">
+                    <div class="form-group">
+                        <button class="btn btn-primary" asp-action="GuardarCurso">Guardar Cursos</button>
+                    </div>
+                </div>
+
+            </div>
+            
+
+    </div>
+    <div class="col-md-7">
+        <div class="row ">
+            <div class="col justify-content-end">
+                <div class="card">
+                    <div class="card-header text-center">Cargar Excel Con Alumnos</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                    <input class="form-control-file" type="file" id="ArchivoExcel" name="ArchivoExcel" />
+                            </div>
+                            <div class="col-sm-6">
+                                <button class="btn btn-warning" id="btnCargarDatos" onclick="mostrarDatos()">Mostrar Datos</button>
+                                <button class="btn btn-success" asp-action="GuardarCurso">Enviar Datos a BD</button>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="tbData" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th># Lista</th>
+                                            <th>Rut</th>
+                                            <th>Nombre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+
+
+
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let cargaRealizada = false;
+        function mostrarDatos() {
+            const input = document.getElementById("inputExcel")
+
+            const formData = new FormData()
+
+            formData.append("ArchivoExcel", input.files[0])
+
+            fetch("Cursos/MostrarDatos", {
+                method: "POST",
+                body: formData
+            })
+                .then((response) => { return response.json() })
+                .then((dataJson) => {
+                    dataJson.forEach((item) =>{
+                        $("#tbBody").append(
+                            $("<tr>").append(
+                                $("<td>").text(item.numeroLista),
+                                $("<td>").text(item.rut),
+                                $("<td>").text(item.nombreCompleto),
+
+                            )
+                        )
+                    })
+                    cargaRealizada = true;
+                    document.getElementById("btnCargarDatos").disabled = true;
+                })
+
+
+        }
+
+        function enviarDatos() {
+            const input = document.getElementById("inputExcel")
+
+            const formData = new FormData()
+
+            formData.append("ArchivoExcel", input.files[0])
+            formData.append("Nombre", $("#curso_Nombre").val());
+            formData.append("Año", $("#curso_Año").val());
+
+            fetch("Cursos/GuardarCurso", {
+                method: "POST",
+                body: formData
+            })
+                .then((response) => { return response.json() })
+                .then((dataJson) => {
+
+                    alert(dataJson.mensaje);
+
+                })
+
+
+        }
+
+
+    </script>
+
+
+}

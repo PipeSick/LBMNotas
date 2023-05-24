@@ -1,0 +1,49 @@
+﻿@model UsuariosViewModel
+
+@{
+    ViewData["Title"] = "EditarUsuario";
+}
+
+
+
+<div class="container d-flex justify-content-center align-items-center">
+
+    <div class="card w-75">
+        <div class="card-header d-flex justify-content-center align-items-center bg-primary text-white ">
+            <h2>Editar Usuario @Model.NombreUsuario</h2>
+        </div>
+        <div class="card-body ">
+            <form asp-action="EditarUser">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="IdUsuario"/>
+                <div class="mb-3">
+                    <label asp-for="NombreUsuario" class="form-label"></label>
+                    <input asp-for="NombreUsuario" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Contraseña" class="form-label"></label>
+                    <input asp-for="Contraseña" class="form-control" />
+                </div>
+                
+                <div class="mb-3">
+                    <label asp-for="Roles" class="form-label"></label>
+                    <select asp-for="Roles" class="form-select" aria-label="Selecciona el rol">
+                        <option value="admin">Administrador</option>
+                        <option value="profesor">Profesor</option>
+                    </select>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary">Editar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

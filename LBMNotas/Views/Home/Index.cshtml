@@ -1,1 +1,189 @@
-﻿
+﻿@model CursosListadoViewModel
+
+@{
+    ViewData["Title"] = "Inicio";
+    Layout = "../shared/_Layout";
+    int index = 1; // Variable para generar un identificador único para cada acordeón
+}
+
+
+
+<form class="filter-form" method="get">
+    <label for="year">Seleccione el año:</label>
+    <select id="year" name="year">
+        <option value="2023" selected="@(Model.añoseleccionado == 2023)">2023</option>
+        <option value="2024" selected="@(Model.añoseleccionado == 2024)">2024</option>
+        <option value="2025" selected="@(Model.añoseleccionado == 2025)">2025</option>
+    </select>
+    <button asp-action="Index" type="submit">Filtrar</button>
+</form>
+
+@if (Model.CursosListado.Count == 0)
+{
+    <div class="text-center">
+        <p class="text-muted">Aún no se han agregado cursos para el año seleccionado.</p>
+        <a asp-action="Index" asp-controller="Cursos" class="btn btn-primary">Agregar Curso</a>
+    </div>
+}
+else
+{
+    <div class="accordion" id="cursosAccordion">
+        @foreach (var curso in Model.CursosListado)
+        {
+        <div class="accordion-item">
+                <h2 class="accordion-header" id="cursoHeading-@index">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#cursoCollapse-@index" aria-expanded="false" aria-controls="cursoCollapse-@index">
+                    @curso.Nombre
+                </button>
+            </h2>
+
+                <div id="cursoCollapse-@index" class="accordion-collapse collapse" aria-labelledby="cursoCollapse-@index" data-bs-parent="#cursosAccordion">
+                <div class="accordion-body">
+                    <div class="accordion" id="asignaturasAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="asignaturasHeading">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#asignaturasCollapse" aria-expanded="false" aria-controls="asignaturasCollapse">
+                                    Asignaturas
+                                </button>
+                            </h2>
+
+                            <div id="asignaturasCollapse" class="accordion-collapse collapse" aria-labelledby="asignaturasHeading" data-bs-parent="#asignaturasAccordion">
+                                <div class="accordion-body">
+                                    <!-- Contenido de las asignaturas aquí -->
+                                        @if (curso.Asignaturas is null || !curso.Asignaturas.Any())
+                                        {
+                                            <p>El curso aún no posee asignaturas.</p>
+                                            <div>
+                                                <a class="btn btn-primary" asp-action="CrearAsignaturas" asp-controller="Asignaturas" asp-route-IdCurso="@curso.Id">Agregar Asignatura</a>
+                                            </div>
+                                            
+                                        }
+                                        else
+                                        {
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Asignatura</th>
+                                                        <th style="width: 30px;">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var asignaturas in curso.Asignaturas)
+                                                    {
+                                                        
+                                                        <tr>
+                                                            <td>@asignaturas.Nombre</td>
+                                                            <td class="text-center"><i class="material-icons">settings</i></td> <!-- Icono de tuerca de Material Design -->
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="2" class="text-end">
+                                                            <a class="btn btn-primary" asp-action="CrearAsignaturas" asp-controller="Asignaturas" asp-route-IdCurso="@curso.Id">Agregar Asignatura</a>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+
+                                        }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion" id="estudiantesAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="estudiantesHeading">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#estudiantesCollapse" aria-expanded="true" aria-controls="estudiantesCollapse">
+                                    Estudiantes
+                                </button>
+                            </h2>
+
+                            <div id="estudiantesCollapse" class="accordion-collapse collapse" aria-labelledby="estudiantesHeading" data-bs-parent="#estudiantesAccordion">
+                                <div class="accordion-body">
+                                    <!-- Contenido de los estudiantes aquí -->
+                                    @if (curso.alumnoCursos is null)
+                                        {
+                                            <p>el curso aún no posee alumnos.</p>
+                                        }else
+                                        {
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Rut</th>
+                                                        <th>Nombre Completo</th>
+                                                        <th style="width: 30px;">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var alumno in curso.alumnoCursos)
+                                                    {
+                                                        var alumnos = alumno.Alumnos;
+                                                        <tr>
+                                                            <td>@alumnos.NumeroLista</td>
+                                                            <td>@alumnos.Rut</td>
+                                                            <td>@alumnos.NombreCompleto</td>                                                         
+
+                                                            <td class="text-center"><i class="material-icons">settings</i></td> <!-- Icono de tuerca de Material Design -->
+                                                        </tr>
+                                                    }
+                                                </tbody>                                               
+                                            </table>
+                                        }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            index++; // Incrementar el índice único para el siguiente acordeón
+        }
+    </div>
+    <div class="text-center m-4">
+        <a asp-action="Index" asp-controller="Cursos" class="btn btn-primary">Agregar Curso</a>
+    </div>
+
+}
+
+
+<style>
+    /* Estilos para el formulario */
+    .filter-form {
+        position: sticky;
+        top: 0;
+        left: 0;
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        margin-top: 40px; /* Ajusta el valor según la altura de tu barra de navegación */
+    }
+    .filter-form label {
+            font-weight: bold;
+    }
+
+        .filter-form select {
+            margin-right: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .filter-form button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+            .filter-form button:hover {
+                background-color: #0056b3;
+            }
+</style>
+

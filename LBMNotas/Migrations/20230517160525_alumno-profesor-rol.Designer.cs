@@ -4,6 +4,7 @@ using LBMNotas.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LBMNotas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230517160525_alumno-profesor-rol")]
+    partial class alumnoprofesorrol
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,48 +25,24 @@ namespace LBMNotas.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("LBMNotas.Models.AlumnoCurso", b =>
+            modelBuilder.Entity("LBMNotas.Models.Alumnos", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AlumnosId")
-                        .HasColumnType("int");
+                    b.Property<string>("Rut")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("CursosId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("AlumnosId");
-
-                    b.HasIndex("CursosId");
-
-                    b.ToTable("alumnoCursos");
-                });
-
-            modelBuilder.Entity("LBMNotas.Models.Alumnos", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("NombreCompleto")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NumeroLista")
-                        .HasColumnType("int");
+                    b.HasKey("Rut");
 
-                    b.Property<string>("Rut")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
+                    b.HasIndex("CursosId");
 
                     b.ToTable("Alumnos");
                 });
@@ -76,17 +55,36 @@ namespace LBMNotas.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CursosId")
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UnidadesId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Nombre")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("cursosId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CursosId");
+                    b.HasIndex("cursosId");
 
                     b.ToTable("Asignaturas");
+                });
+
+            modelBuilder.Entity("LBMNotas.Models.CursoAsignatura", b =>
+                {
+                    b.Property<int>("CursosId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AsignaturasId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CursosId", "AsignaturasId");
+
+                    b.HasIndex("AsignaturasId");
+
+                    b.ToTable("CursoAsignaturas");
                 });
 
             modelBuilder.Entity("LBMNotas.Models.Cursos", b =>
@@ -108,6 +106,24 @@ namespace LBMNotas.Migrations
                     b.ToTable("Cursos");
                 });
 
+            modelBuilder.Entity("LBMNotas.Models.EtapaUnidad", b =>
+                {
+                    b.Property<int>("UnidadesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EtapasId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("UnidadesId", "EtapasId");
+
+                    b.HasIndex("EtapasId");
+
+                    b.ToTable("EtapaUnidad");
+                });
+
             modelBuilder.Entity("LBMNotas.Models.Etapas", b =>
                 {
                     b.Property<int>("Id")
@@ -125,12 +141,7 @@ namespace LBMNotas.Migrations
                     b.Property<int>("Porcentaje")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnidadesId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UnidadesId");
 
                     b.ToTable("Etapas");
                 });
@@ -194,9 +205,11 @@ namespace LBMNotas.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Rut")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -217,10 +230,12 @@ namespace LBMNotas.Migrations
                     b.Property<int>("AsignaturasID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Descripcion")
+                    b.Property<string>("Descripción")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -396,43 +411,62 @@ namespace LBMNotas.Migrations
                     b.ToTable("UserTokens");
                 });
 
-            modelBuilder.Entity("LBMNotas.Models.AlumnoCurso", b =>
+            modelBuilder.Entity("LBMNotas.Models.Alumnos", b =>
                 {
-                    b.HasOne("LBMNotas.Models.Alumnos", "Alumnos")
-                        .WithMany("alumnoCursos")
-                        .HasForeignKey("AlumnosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("LBMNotas.Models.Cursos", "Cursos")
-                        .WithMany("alumnoCursos")
+                        .WithMany("Alumnos")
                         .HasForeignKey("CursosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Alumnos");
 
                     b.Navigation("Cursos");
                 });
 
             modelBuilder.Entity("LBMNotas.Models.Asignaturas", b =>
                 {
-                    b.HasOne("LBMNotas.Models.Cursos", "Cursos")
-                        .WithMany("Asignaturas")
-                        .HasForeignKey("CursosId")
+                    b.HasOne("LBMNotas.Models.Cursos", "cursos")
+                        .WithMany()
+                        .HasForeignKey("cursosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("cursos");
+                });
+
+            modelBuilder.Entity("LBMNotas.Models.CursoAsignatura", b =>
+                {
+                    b.HasOne("LBMNotas.Models.Asignaturas", "Asignaturas")
+                        .WithMany("CursoAsignaturas")
+                        .HasForeignKey("AsignaturasId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LBMNotas.Models.Cursos", "Cursos")
+                        .WithMany("CursoAsignaturas")
+                        .HasForeignKey("CursosId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asignaturas");
 
                     b.Navigation("Cursos");
                 });
 
-            modelBuilder.Entity("LBMNotas.Models.Etapas", b =>
+            modelBuilder.Entity("LBMNotas.Models.EtapaUnidad", b =>
                 {
+                    b.HasOne("LBMNotas.Models.Etapas", "Etapas")
+                        .WithMany("EtapasUnidad")
+                        .HasForeignKey("EtapasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("LBMNotas.Models.Unidades", "Unidades")
-                        .WithMany("Etapas")
+                        .WithMany("EtapasUnidad")
                         .HasForeignKey("UnidadesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Etapas");
 
                     b.Navigation("Unidades");
                 });
@@ -471,7 +505,9 @@ namespace LBMNotas.Migrations
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -487,13 +523,10 @@ namespace LBMNotas.Migrations
                     b.Navigation("Asignaturas");
                 });
 
-            modelBuilder.Entity("LBMNotas.Models.Alumnos", b =>
-                {
-                    b.Navigation("alumnoCursos");
-                });
-
             modelBuilder.Entity("LBMNotas.Models.Asignaturas", b =>
                 {
+                    b.Navigation("CursoAsignaturas");
+
                     b.Navigation("ProfesorAsignaturas");
 
                     b.Navigation("Unidades");
@@ -501,9 +534,14 @@ namespace LBMNotas.Migrations
 
             modelBuilder.Entity("LBMNotas.Models.Cursos", b =>
                 {
-                    b.Navigation("Asignaturas");
+                    b.Navigation("Alumnos");
 
-                    b.Navigation("alumnoCursos");
+                    b.Navigation("CursoAsignaturas");
+                });
+
+            modelBuilder.Entity("LBMNotas.Models.Etapas", b =>
+                {
+                    b.Navigation("EtapasUnidad");
                 });
 
             modelBuilder.Entity("LBMNotas.Models.Profesores", b =>
@@ -513,9 +551,10 @@ namespace LBMNotas.Migrations
 
             modelBuilder.Entity("LBMNotas.Models.Unidades", b =>
                 {
-                    b.Navigation("Etapas");
+                    b.Navigation("EtapasUnidad");
 
-                    b.Navigation("notaFinalUnidad");
+                    b.Navigation("notaFinalUnidad")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

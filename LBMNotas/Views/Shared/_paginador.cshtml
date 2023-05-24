@@ -1,0 +1,59 @@
+﻿@model PaginacionModel;
+
+@{
+    var cantidadPaginas = (int)Math.Ceiling((double)Model.TotalRegistros / Model.RegistrosPorPagina);
+    
+}
+
+@{
+    int Inicial = 1;
+    var radio = 3;
+    var cantidadMaximaDePaginas = radio * 2 + 1;
+    int Final = (cantidadPaginas > cantidadMaximaDePaginas) ? cantidadMaximaDePaginas : cantidadPaginas;
+    if (Model.PaginaActual > radio + 1)
+    {
+        Inicial = Model.PaginaActual - radio;
+        if (cantidadPaginas > Model.PaginaActual + radio)
+        {
+            Final = Model.PaginaActual + radio;
+        }
+        else
+        {
+            Final = cantidadPaginas;
+        }
+    }
+}
+<div class="list-group list-group-horizontal align-content-end">
+    @if (Model.PaginaActual == cantidadPaginas)
+    {
+        <button class="btn btn-outline-dark">@Html.ActionLink("Primera", null, new{pagina = 1})</button>
+        
+    }else
+    {
+        <button class="btn btn-outline-dark disabled">@Html.ActionLink("Primera", null, new{pagina = 1})</button>
+
+    }
+
+
+    @for (int i = Inicial; i <= Final; i++)
+    {
+        if (i == Model.PaginaActual)
+        {
+            <button class="btn btn-outline-dark active">@Html.ActionLink(i.ToString(), null, new {pagina = i})</button>
+        }
+        else
+        {
+            <buttton class="btn btn-outline-dark">@Html.ActionLink(i.ToString(), null, new {pagina = i})</buttton>
+        }
+    }
+    @if (Model.PaginaActual == cantidadPaginas)
+    {
+        <button class="btn btn-outline-dark disabled">@Html.ActionLink("Ultima", null, new {pagina = cantidadPaginas})</button>
+    }else
+    {
+        <button class="btn btn-outline-dark">@Html.ActionLink("Ultima", null, new {pagina = cantidadPaginas})</button>
+    
+    }
+    
+    
+</div>

@@ -4,6 +4,7 @@ using LBMNotas.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LBMNotas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230523200851_dbupdatev1")]
+    partial class dbupdatev1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -217,7 +220,7 @@ namespace LBMNotas.Migrations
                     b.Property<int>("AsignaturasID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Descripcion")
+                    b.Property<string>("Descripción")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")

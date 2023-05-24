@@ -4,6 +4,7 @@ using LBMNotas.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LBMNotas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230522154630_alumnos-curso-created")]
+    partial class alumnoscursocreated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,15 +33,15 @@ namespace LBMNotas.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AlumnosId")
-                        .HasColumnType("int");
+                    b.Property<string>("AlumnosRut")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("CursosId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AlumnosId");
+                    b.HasIndex("AlumnosRut");
 
                     b.HasIndex("CursosId");
 
@@ -47,11 +50,8 @@ namespace LBMNotas.Migrations
 
             modelBuilder.Entity("LBMNotas.Models.Alumnos", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Rut")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("NombreCompleto")
                         .IsRequired()
@@ -60,10 +60,7 @@ namespace LBMNotas.Migrations
                     b.Property<int>("NumeroLista")
                         .HasColumnType("int");
 
-                    b.Property<string>("Rut")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
+                    b.HasKey("Rut");
 
                     b.ToTable("Alumnos");
                 });
@@ -76,17 +73,30 @@ namespace LBMNotas.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CursosId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Nombre")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UnidadesId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CursosId");
-
                     b.ToTable("Asignaturas");
+                });
+
+            modelBuilder.Entity("LBMNotas.Models.CursoAsignatura", b =>
+                {
+                    b.Property<int>("CursosId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AsignaturasId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CursosId", "AsignaturasId");
+
+                    b.HasIndex("AsignaturasId");
+
+                    b.ToTable("CursoAsignaturas");
                 });
 
             modelBuilder.Entity("LBMNotas.Models.Cursos", b =>
@@ -108,6 +118,24 @@ namespace LBMNotas.Migrations
                     b.ToTable("Cursos");
                 });
 
+            modelBuilder.Entity("LBMNotas.Models.EtapaUnidad", b =>
+                {
+                    b.Property<int>("UnidadesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EtapasId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("UnidadesId", "EtapasId");
+
+                    b.HasIndex("EtapasId");
+
+                    b.ToTable("EtapaUnidad");
+                });
+
             modelBuilder.Entity("LBMNotas.Models.Etapas", b =>
                 {
                     b.Property<int>("Id")
@@ -125,12 +153,7 @@ namespace LBMNotas.Migrations
                     b.Property<int>("Porcentaje")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnidadesId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UnidadesId");
 
                     b.ToTable("Etapas");
                 });
@@ -217,7 +240,7 @@ namespace LBMNotas.Migrations
                     b.Property<int>("AsignaturasID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Descripcion")
+                    b.Property<string>("Descripción")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
@@ -400,9 +423,7 @@ namespace LBMNotas.Migrations
                 {
                     b.HasOne("LBMNotas.Models.Alumnos", "Alumnos")
                         .WithMany("alumnoCursos")
-                        .HasForeignKey("AlumnosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AlumnosRut");
 
                     b.HasOne("LBMNotas.Models.Cursos", "Cursos")
                         .WithMany("alumnoCursos")
@@ -415,24 +436,40 @@ namespace LBMNotas.Migrations
                     b.Navigation("Cursos");
                 });
 
-            modelBuilder.Entity("LBMNotas.Models.Asignaturas", b =>
+            modelBuilder.Entity("LBMNotas.Models.CursoAsignatura", b =>
                 {
-                    b.HasOne("LBMNotas.Models.Cursos", "Cursos")
-                        .WithMany("Asignaturas")
-                        .HasForeignKey("CursosId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("LBMNotas.Models.Asignaturas", "Asignaturas")
+                        .WithMany("CursoAsignaturas")
+                        .HasForeignKey("AsignaturasId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("LBMNotas.Models.Cursos", "Cursos")
+                        .WithMany("CursoAsignaturas")
+                        .HasForeignKey("CursosId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asignaturas");
 
                     b.Navigation("Cursos");
                 });
 
-            modelBuilder.Entity("LBMNotas.Models.Etapas", b =>
+            modelBuilder.Entity("LBMNotas.Models.EtapaUnidad", b =>
                 {
+                    b.HasOne("LBMNotas.Models.Etapas", "Etapas")
+                        .WithMany("EtapasUnidad")
+                        .HasForeignKey("EtapasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("LBMNotas.Models.Unidades", "Unidades")
-                        .WithMany("Etapas")
+                        .WithMany("EtapasUnidad")
                         .HasForeignKey("UnidadesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Etapas");
 
                     b.Navigation("Unidades");
                 });
@@ -494,6 +531,8 @@ namespace LBMNotas.Migrations
 
             modelBuilder.Entity("LBMNotas.Models.Asignaturas", b =>
                 {
+                    b.Navigation("CursoAsignaturas");
+
                     b.Navigation("ProfesorAsignaturas");
 
                     b.Navigation("Unidades");
@@ -501,9 +540,14 @@ namespace LBMNotas.Migrations
 
             modelBuilder.Entity("LBMNotas.Models.Cursos", b =>
                 {
-                    b.Navigation("Asignaturas");
+                    b.Navigation("CursoAsignaturas");
 
                     b.Navigation("alumnoCursos");
+                });
+
+            modelBuilder.Entity("LBMNotas.Models.Etapas", b =>
+                {
+                    b.Navigation("EtapasUnidad");
                 });
 
             modelBuilder.Entity("LBMNotas.Models.Profesores", b =>
@@ -513,7 +557,7 @@ namespace LBMNotas.Migrations
 
             modelBuilder.Entity("LBMNotas.Models.Unidades", b =>
                 {
-                    b.Navigation("Etapas");
+                    b.Navigation("EtapasUnidad");
 
                     b.Navigation("notaFinalUnidad");
                 });

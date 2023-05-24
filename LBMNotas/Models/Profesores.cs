@@ -14,6 +14,6 @@ namespace LBMNotas.Models
 
         public string UserId { get; set; }
         public IdentityUser User { get; set; }
-        public List<ProfesorAsignatura>? ProfesoresAsignaturas { get; set; }
+        public List<ProfesorAsignatura> ProfesoresAsignaturas { get; set; }
     }
 }
