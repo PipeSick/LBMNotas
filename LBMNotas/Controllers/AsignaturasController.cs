@@ -18,9 +18,15 @@ namespace LBMNotas.Controllers
 
 
         [HttpGet]
-        public IActionResult AsignaturasIndex(int IdAsignatura)
+        public IActionResult AsignaturasIndex(int IdAsignatura, int IdCurso, int IdUnidad)
         {
+
             var modelo = new AsignaturaDetallesViewModel();
+
+            var ListaAlumnos = context.Alumnos
+        .Where(a => a.alumnoCursos.Any(ac => ac.CursosId == IdCurso))
+        .ToList();
+
             var AsignaturaDatos = context.Asignaturas.Where(a => a.Id == IdAsignatura).FirstOrDefault();
             var ListaUnidades = context.Unidades.Where(u => u.AsignaturasID == IdAsignatura).ToList();
             var ListaCompletaEtapas = new List<Etapas>();
@@ -39,6 +45,8 @@ namespace LBMNotas.Controllers
                 return NotFound();
             }
 
+            modelo.IdCurso = IdCurso;
+            modelo.Alumnos = ListaAlumnos;
             modelo.Asignaturas = AsignaturaDatos;
             modelo.Unidades = ListaUnidades;
             modelo.Etapas = ListaCompletaEtapas;
@@ -59,17 +67,6 @@ namespace LBMNotas.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Validar suma de porcentajes
-                int totalPorcentaje = model.Unidades
-                    .SelectMany(u => u.Etapas)
-                    .Sum(e => e.Porcentaje);
-
-                if (totalPorcentaje != 100)
-                {
-                    ModelState.AddModelError(string.Empty, "La suma de los porcentajes de las etapas debe ser igual a 100.");
-                    return View(model);
-                }
-
                 var nuevaAsignatura = new Asignaturas
                 {
                     Nombre = model.nombreasignatura,
@@ -112,6 +109,24 @@ namespace LBMNotas.Controllers
             return View(model);
         }
 
+        public IActionResult Filtrar(int IdUnidad, int IdCurso, int IdAsignatura)
+        {
+            var AsignaturaDatos = context.Asignaturas.Where(a => a.Id == IdAsignatura).FirstOrDefault();
+            var modelo = new AsignaturaDetallesViewModel();
+            var ListaAlumnos = context.Alumnos
+                .Where(a => a.alumnoCursos.Any(ac => ac.CursosId == IdCurso))
+                .ToList();
+            var Unidad = context.Unidades.Where(u => u.Id == IdUnidad).FirstOrDefault();
+            var ListaUnidades = context.Unidades.Where(u => u.AsignaturasID == IdAsignatura).ToList();
+            var ListaEtapasUnidad = context.Etapas.Where(e => e.UnidadesId == IdUnidad).ToList();
 
+            modelo.Asignaturas = AsignaturaDatos;
+            modelo.IdCurso = IdCurso;
+            modelo.Alumnos = ListaAlumnos;
+            modelo.Unidad = Unidad;
+            modelo.Etapas = ListaEtapasUnidad;
+            modelo.Unidades = ListaUnidades;
+            return View("AsignaturasIndex", modelo);
+        }
     }
 }

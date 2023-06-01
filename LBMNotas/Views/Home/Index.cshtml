@@ -74,7 +74,7 @@ else
                                                         <tr>
                                                             <td>@asignaturas.Nombre</td>
                                                             <td class="text-center">
-                                                                <a asp-action="AsignaturasIndex" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id"><i class="material-icons">settings</i></a>
+                                                                                <a asp-action="AsignaturasIndex" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id" asp-route-IdCurso="@curso.Id"><i class="material-icons">settings</i></a>
                                                              </td> <!-- Icono de tuerca de Material Design -->
                                                         </tr>
                                                     }
