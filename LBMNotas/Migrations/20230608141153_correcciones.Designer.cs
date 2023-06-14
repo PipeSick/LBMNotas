@@ -4,6 +4,7 @@ using LBMNotas.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LBMNotas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230608141153_correcciones")]
+    partial class correcciones
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,17 +172,20 @@ namespace LBMNotas.Migrations
                     b.Property<int>("AlumnoId")
                         .HasColumnType("int");
 
+                    b.Property<int>("IDUnidad")
+                        .HasColumnType("int");
+
                     b.Property<float>("NotaFinal")
                         .HasColumnType("real");
 
-                    b.Property<int>("UnidadId")
+                    b.Property<int?>("unidadesId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AlumnoId");
 
-                    b.HasIndex("UnidadId");
+                    b.HasIndex("unidadesId");
 
                     b.ToTable("NotaFinalUnidad");
                 });
@@ -491,15 +497,13 @@ namespace LBMNotas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBMNotas.Models.Unidades", "Unidad")
+                    b.HasOne("LBMNotas.Models.Unidades", "unidades")
                         .WithMany("notaFinalUnidad")
-                        .HasForeignKey("UnidadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("unidadesId");
 
                     b.Navigation("Alumno");
 
-                    b.Navigation("Unidad");
+                    b.Navigation("unidades");
                 });
 
             modelBuilder.Entity("LBMNotas.Models.ProfesorAsignatura", b =>

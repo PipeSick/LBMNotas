@@ -29,10 +29,7 @@ namespace LBMNotas.Context
                 .WithMany(p => p.ProfesoresAsignaturas)
                 .HasForeignKey(ap => ap.ProfesoresId);
 
-            modelBuilder.Entity<Unidades>()
-                .HasOne(u => u.notaFinalUnidad)
-                .WithOne(nf => nf.unidades)
-                .HasForeignKey<NotaFinalUnidad>(nf => nf.IDUnidad);
+
 
 
 
@@ -65,6 +62,7 @@ namespace LBMNotas.Context
         public DbSet<Etapas> Etapas { get; set; }
         public DbSet<ProfesorAsignatura> ProfesorAsignatura { get; set; }
         public DbSet<AlumnoCurso> alumnoCursos { get; set; }
+        public DbSet<CalificacionAlumno> calificacionAlumnos { get; set; }
 
     }
 }

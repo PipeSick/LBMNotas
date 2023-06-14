@@ -4,6 +4,7 @@ using LBMNotas.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LBMNotas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230605134547_alumnos-nota-create")]
+    partial class alumnosnotacreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,9 +113,10 @@ namespace LBMNotas.Migrations
 
                     b.HasIndex("AlumnoId");
 
-                    b.HasIndex("EtapaId");
+                    b.HasIndex("EtapaId")
+                        .IsUnique();
 
-                    b.ToTable("calificacionAlumnos");
+                    b.ToTable("CalificacionAlumno");
                 });
 
             modelBuilder.Entity("LBMNotas.Models.Cursos", b =>
@@ -166,20 +170,16 @@ namespace LBMNotas.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AlumnoId")
+                    b.Property<int>("IDUnidad")
                         .HasColumnType("int");
 
                     b.Property<float>("NotaFinal")
                         .HasColumnType("real");
 
-                    b.Property<int>("UnidadId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("AlumnoId");
-
-                    b.HasIndex("UnidadId");
+                    b.HasIndex("IDUnidad")
+                        .IsUnique();
 
                     b.ToTable("NotaFinalUnidad");
                 });
@@ -462,8 +462,8 @@ namespace LBMNotas.Migrations
                         .IsRequired();
 
                     b.HasOne("LBMNotas.Models.Etapas", "Etapa")
-                        .WithMany("Calificacion")
-                        .HasForeignKey("EtapaId")
+                        .WithOne("Calificacion")
+                        .HasForeignKey("LBMNotas.Models.CalificacionAlumno", "EtapaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -485,21 +485,13 @@ namespace LBMNotas.Migrations
 
             modelBuilder.Entity("LBMNotas.Models.NotaFinalUnidad", b =>
                 {
-                    b.HasOne("LBMNotas.Models.Alumnos", "Alumno")
-                        .WithMany("NotaFinalUnidads")
-                        .HasForeignKey("AlumnoId")
+                    b.HasOne("LBMNotas.Models.Unidades", "unidades")
+                        .WithOne("notaFinalUnidad")
+                        .HasForeignKey("LBMNotas.Models.NotaFinalUnidad", "IDUnidad")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBMNotas.Models.Unidades", "Unidad")
-                        .WithMany("notaFinalUnidad")
-                        .HasForeignKey("UnidadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Alumno");
-
-                    b.Navigation("Unidad");
+                    b.Navigation("unidades");
                 });
 
             modelBuilder.Entity("LBMNotas.Models.ProfesorAsignatura", b =>
@@ -544,8 +536,6 @@ namespace LBMNotas.Migrations
             modelBuilder.Entity("LBMNotas.Models.Alumnos", b =>
                 {
                     b.Navigation("Calificaciones");
-
-                    b.Navigation("NotaFinalUnidads");
 
                     b.Navigation("alumnoCursos");
                 });

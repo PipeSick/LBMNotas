@@ -8,5 +8,6 @@
         public Asignaturas Asignaturas { get; set; }
         public Unidades Unidad { get; set; }
         public int IdCurso { get; set; }
+        public List<CalificacionAlumno> calificacions { get; set; }
     }
 }

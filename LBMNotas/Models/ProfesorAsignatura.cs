@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public int ProfesoresId { get; set; }
         public int AsignaturasId { get; set; }
-        public Profesores Profesores { get; set; }
+        public User Profesores { get; set; }
         public Asignaturas Asignaturas { get; set; }
     }
 }

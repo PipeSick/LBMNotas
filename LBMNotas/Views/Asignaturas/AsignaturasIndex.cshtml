@@ -5,19 +5,28 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://unpkg.com/tableexport@5.2.0/dist/css/tableexport.css">
 <link rel="stylesheet" href="/css/UserListStyle.css" />
+
+
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="~/js/FileSaver.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"> </script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"> </script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"> </script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
 
+
+<!-- Parte del filtro.-->
 <form id="filtroForm" method="post" action="Filtrar" class="my-4">
     <div class="row g-3 align-items-center">
         <div class="col-auto">
             <label for="unidad" class="col-form-label">Seleccionar unidad:</label>
         </div>
         <div class="col-auto">
-            <select id="unidad" name="IdUnidad" class="form-select" required>
+            <select id="unidad" name="IdUnidad" class="form-select" required data-selected-unidad="@Model.Unidad?.Id" onchange="actualizarFiltro()">
                 <option value="" disabled selected>-- Seleccionar --</option>
                 @foreach (var unidad in Model.Unidades)
                 {
@@ -29,12 +38,15 @@
             <input value="@Model.IdCurso" name="IdCurso" type="hidden" />
             <input value="@Model.Asignaturas.Id" name="IdAsignatura" type="hidden" />
             <button id="filtrar" class="btn btn-primary" type="submit">Filtrar</button>
+
         </div>
     </div>
 </form>
 
 
-<div class="container-xl">
+
+<!-- Acá empieza la tabla donde se muestran las notas.-->
+<div class="container-xl" id="TablaNotas">
     <div class="table-responsive table-bordered">
         @if (Model.Unidad != null && !string.IsNullOrEmpty(Model.Unidad.Nombre))
         {
@@ -45,19 +57,21 @@
                             <h2>Notas de la unidad: <b>@Model.Unidad.Nombre</b></h2>
                         </div>
                         <div class="col-sm-7">
-                            <a href="#" class="btn btn-secondary"><i class="material-icons">&#xE415;</i> <span>Exportar a PDF</span></a>
-                            <a href="#" class="btn btn-secondary"><i class="material-icons">&#xE24D;</i> <span>Exportar a Excel</span></a>
+                            <a href="#" class="btn btn-secondary" onclick="exportarPDF()"><i class="material-icons">&#xE415;</i> <span>Exportar a PDF</span></a>
+                            <a href="#" class="btn btn-secondary" onclick="exportarExcel()"><i class="material-icons">&#xE24D;</i> <span>Exportar a Excel</span>
+
+            </a>
                         </div>
                     </div>
                 </div>
-                <table class="table table-striped table-hover" id="TablaNotas">
+                <table class="table table-striped table-hover">
                     <thead>
                         <tr>
                             <th rowspan="2" class="table-header" style="vertical-align:middle;text-align:center">N°</th>
                             <th rowspan="2" class="table-header" style="vertical-align:middle">Nombre Completo</th>
                             <th rowspan="2" class="table-header" style="vertical-align:middle">Rut</th>
                             <th colspan="@Model.Etapas.Count" class="table-header table-header-etapas" style="vertical-align:middle; text-align:center;">Etapas</th>
-                            <th colspan="12" rowspan="2" class="table-header" style="vertical-align:middle">Nota Final</th>
+                            <th rowspan="2" class="table-header" style="vertical-align:middle">Nota Final</th>
                         </tr>
                         <tr>
                             @foreach (var listaetapas in Model.Etapas)
@@ -78,15 +92,18 @@
 
                                 @foreach (var listaetapas in Model.Etapas)
                                 {
+                                    var calificacion = Model.calificacions != null && Model.calificacions.Any(c => c.AlumnoId == listaalumnos.Id && c.EtapaId == listaetapas.Id) ? Model.calificacions.FirstOrDefault(c => c.AlumnoId == listaalumnos.Id && c.EtapaId == listaetapas.Id) : null;
+                                    var notas = calificacion != null ? calificacion.Nota : (float?)null;                                      
+
+                                        
                                     <td class="table-cell">
-                                        <input id="NotaEtapa" type="text" class="form-control" style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center;text-transform:uppercase;">
+                                        <input id="nota-@listaalumnos.Id-@listaetapas.Id" type="text" class="form-control nota-input" data-alumno-id="@listaalumnos.Id" data-etapa-id="@listaetapas.Id" data-peso="@listaetapas.Porcentaje" value="@notas" style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center;text-transform:uppercase;">
 
                                     </td>
-
                                 }
                                 
-                                <td class="table-cell" colspan="11">
-                                    <input id="NotaFinal" type="text" class="form-control" style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center">
+                                <td class="table-cell">
+                                    <input id="NotaFinal-@listaalumnos.Id" type="text" class="form-control promedio-input" style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center">
                                 </td>
                             </tr>
                         }
@@ -115,4 +132,228 @@
     }
 </style>
 
+<script>
+
+    //Funcion para mostrar los promedios a penas se carge el formulario.
+    $(document).ready(function () {
+        mostrarPromedios();
+    });
+
+
+    //Función para que cuando se agrege una nota, esta se guarde inmediatamente en la BD.
+    $(document).ready(function () {
+        $('.nota-input').change(function () {
+            var input = $(this);
+            var alumnoId = $(this).data('alumno-id');
+            var etapaId = $(this).data('etapa-id');
+            var nota = $(this).val();       
+            // Construir el identificador único del campo de entrada de nota
+            var inputId = `#nota-${alumnoId}-${etapaId}`;
+
+            // Envía una solicitud al servidor para guardar la calificación
+            $.ajax({
+                url: '/Calificaciones/Guardar',
+                method: 'POST',
+                data: {
+                    AlumnoId: alumnoId,
+                    EtapaId: etapaId,
+                    Nota: nota
+                },
+                success: function (response) {
+                    // Actualiza la vista o realiza otras acciones necesarias
+                    mostrarPromedios();
+                },
+                error: function (xhr, status, error) {
+                    // Maneja los errores de la solicitud
+                    var errorMessage = xhr.responseText || error;
+                    console.log(errorMessage); // Muestra el mensaje de error en la consola
+                }
+            });
+
+
+        });
+    });
+
+    //Funcion complementaria donde se calcula el promedio del alumno.
+    function calcularPromedio(alumnoId) {
+        var notas = $('.nota-input[data-alumno-id="' + alumnoId + '"]').map(function () {
+            var nota = parseFloat($(this).val());
+            var peso = parseFloat($(this).data('peso'));
+            return isNaN(nota) || isNaN(peso) ? 0 : nota * peso;
+        }).get();
+
+        var suma = notas.reduce(function (a, b) {
+            return a + b;
+        }, 0);
+
+        var pesosTotales = $('.nota-input[data-alumno-id="' + alumnoId + '"]').map(function () {
+            var peso = parseFloat($(this).data('peso'));
+            return isNaN(peso) ? 0 : peso;
+        }).get().reduce(function (a, b) {
+            return a + b;
+        }, 0);
+
+        var promedio = pesosTotales !== 0 ? suma / pesosTotales : 0;
+
+        return Math.round(promedio);
+    }
+
+    function mostrarPromedios() {
+        var unidadSeleccionada = $('#unidad').data('selected-unidad');
+        var alumnoIds = new Set();
+
+        // Verificar si se ha seleccionado una unidad
+        if (unidadSeleccionada) {
+            $('.nota-input').each(function () {
+                var alumnoId = $(this).data('alumno-id');
+                alumnoIds.add(alumnoId);
+            });
+
+            alumnoIds = Array.from(alumnoIds);
+
+            var data = {
+                Alumnos: []
+            };
+
+            alumnoIds.forEach(function (alumnoId) {
+                var promedio = calcularPromedio(alumnoId);
+                $('#NotaFinal-' + alumnoId).val(promedio);
+
+                data.Alumnos.push({
+                    AlumnoId: alumnoId,
+                    Promedio: promedio
+                });
+            });
+
+            $.ajax({
+                url: '/Calificaciones/GuardarPromedio',
+                method: 'POST',
+                data: {
+                    UnidadId: unidadSeleccionada,
+                    Alumnos: data.Alumnos
+                },
+                success: function (response) {
+                    console.log('Promedios guardados correctamente');
+                },
+                error: function (xhr, status, error) {
+                    var errorMessage = xhr.responseText || error;
+                    console.log(errorMessage);
+                }
+            });
+        }
+    }
+
+    function exportarExcel() {
+        // Obtén el valor del nombre de la unidad seleccionada en el momento de exportar
+        var unidadSelect = document.getElementById('unidad');
+        var unidadNombre = unidadSelect.options[unidadSelect.selectedIndex].text;
+
+        // Obtén el valor del nombre de la asignatura desde el modelo
+        var asignaturaNombre = '@Model.Asignaturas.Nombre';
+
+
+        // Concatenar los nombres de la asignatura y la unidad para formar el nombre del archivo
+        var nombreArchivo = asignaturaNombre + '_' + unidadNombre + '.xlsx';
+        // Obtén la referencia a la tabla original
+        var tablaOriginal = document.getElementById('TablaNotas');
+
+        // Crea una copia de la tabla en memoria
+        var tablaCopia = tablaOriginal.cloneNode(true);
+
+        // Restaurar los campos de entrada en la copia de la tabla
+        restaurarCamposEntrada(tablaCopia);
+
+        // Crea una nueva hoja de cálculo de Excel a partir de la tabla copiada
+        var workbook = XLSX.utils.table_to_book(tablaCopia);
+
+
+        // Crea un archivo de Excel y guarda la hoja de cálculo
+        var excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        // Establecer el nombre del libro como el nombre del archivo
+
+        // Descarga el archivo de Excel
+        descargarArchivoExcel(excelBuffer, nombreArchivo);
+    }
+
+    // Función para restaurar los campos de entrada en la copia de la tabla
+    function restaurarCamposEntrada(tabla) {
+        var camposDeEntrada = tabla.querySelectorAll('.nota-input');
+        camposDeEntrada.forEach(function (campo) {
+            var nota = campo.value;
+            campo.parentNode.innerText = nota;
+        });
+
+        var camposPromedio = tabla.querySelectorAll('.promedio-input');
+        camposPromedio.forEach(function (campo) {
+            var promedio = campo.value;
+            campo.parentNode.innerText = promedio;
+        });
+    }
+
+    // Función para descargar el archivo de Excel
+    function descargarArchivoExcel(buffer, nombreArchivo) {
+        var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, nombreArchivo);
+        } else {
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = nombreArchivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    }
+
+    function actualizarFiltro() {
+        var select = document.getElementById("unidad");
+        var selectedOption = select.options[select.selectedIndex].text;
+        localStorage.setItem("selectedOption", selectedOption);
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        var selectedOption = localStorage.getItem("selectedOption");
+        if (selectedOption) {
+            var select = document.getElementById("unidad");
+            for (var i = 0; i < select.options.length; i++) {
+                if (select.options[i].text === selectedOption) {
+                    select.options[i].selected = true;
+                    break;
+                }
+            }
+        }
+    });
+
+    function exportarPDF() {
+        var unidadSelect = document.getElementById('unidad');
+        var unidadNombre = unidadSelect.options[unidadSelect.selectedIndex].text;
+
+        // Obtén el valor del nombre de la asignatura desde el modelo
+        var asignaturaNombre = '@Model.Asignaturas.Nombre';
+
+
+        // Concatenar los nombres de la asignatura y la unidad para formar el nombre del archivo
+        var nombreArchivo = asignaturaNombre + '_' + unidadNombre + '.pdf';
+        // Crea un objeto jsPDF
+        var doc = new jsPDF();
+
+        // Obtiene la tabla por su ID
+        var table = document.getElementById("TablaNotas");
+
+        // Convierte la tabla en formato de datos para jsPDF
+        var data = doc.autoTableHtmlToJson(table);
+
+        // Genera el PDF
+        doc.autoTable({
+            head: [data.columns],
+            body: data.rows,
+        });
+
+        // Guarda el archivo PDF
+        doc.save(nombreArchivo);
+    }
+
+</script>
 

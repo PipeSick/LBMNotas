@@ -9,7 +9,7 @@
         public int AsignaturasID { get; set; }
 
         public Asignaturas Asignaturas { get; set; }
-        public NotaFinalUnidad notaFinalUnidad { get; set; }
+        public List<NotaFinalUnidad> notaFinalUnidad { get; set; }
 
     }
 }

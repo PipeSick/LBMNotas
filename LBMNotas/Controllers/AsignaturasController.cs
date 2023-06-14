@@ -45,6 +45,9 @@ namespace LBMNotas.Controllers
                 return NotFound();
             }
 
+            var calificaciones = context.calificacionAlumnos.ToList();
+
+            modelo.calificacions = calificaciones;
             modelo.IdCurso = IdCurso;
             modelo.Alumnos = ListaAlumnos;
             modelo.Asignaturas = AsignaturaDatos;
@@ -120,6 +123,10 @@ namespace LBMNotas.Controllers
             var ListaUnidades = context.Unidades.Where(u => u.AsignaturasID == IdAsignatura).ToList();
             var ListaEtapasUnidad = context.Etapas.Where(e => e.UnidadesId == IdUnidad).ToList();
 
+
+            var calificaciones = context.calificacionAlumnos.ToList();
+
+            modelo.calificacions = calificaciones;
             modelo.Asignaturas = AsignaturaDatos;
             modelo.IdCurso = IdCurso;
             modelo.Alumnos = ListaAlumnos;
@@ -127,6 +134,17 @@ namespace LBMNotas.Controllers
             modelo.Etapas = ListaEtapasUnidad;
             modelo.Unidades = ListaUnidades;
             return View("AsignaturasIndex", modelo);
+        }
+
+        public   IActionResult VistaNotasFinalesUnidad(int IdAsignatura, int IdCurso)
+        {
+            var notasFinales = context.NotaFinalUnidad
+    .Include(nf => nf.Alumno)
+    .Include(nf => nf.Unidad.Asignaturas)
+    .Where(nf => nf.Unidad.Asignaturas.Id == IdAsignatura)
+    .ToList();
+
+            return View(notasFinales);
         }
     }
 }

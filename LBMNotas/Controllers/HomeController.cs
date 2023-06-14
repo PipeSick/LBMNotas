@@ -1,6 +1,8 @@
 ﻿using LBMNotas.Context;
 using LBMNotas.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.CodeDom.Compiler;
 using System.Diagnostics;
 
@@ -8,21 +10,25 @@ namespace LBMNotas.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly UserManager<IdentityUser> userManager;
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext context;
 
         //Constructor//
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
             this.context = context;
+            this.userManager = userManager;
         }
 
 
         //Carga de datos para la vista.
         public IActionResult Index(int year = 2023)
         {
+
             var listacursos = context.Cursos.Where(c => c.Año == year).ToList();
+
             var modelo = new CursosListadoViewModel();
 
             foreach (var curso in listacursos)
