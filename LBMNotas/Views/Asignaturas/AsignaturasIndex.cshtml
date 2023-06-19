@@ -194,8 +194,14 @@
         }, 0);
 
         var promedio = pesosTotales !== 0 ? suma / pesosTotales : 0;
+        if (promedio % 1 >= 0.5) {
+            promedio = Math.ceil(promedio);
+        } else {
+            promedio = Math.floor(promedio);
+        }
 
-        return Math.round(promedio);
+
+        return (promedio);
     }
 
     function mostrarPromedios() {

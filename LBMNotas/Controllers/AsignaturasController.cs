@@ -11,9 +11,11 @@ namespace LBMNotas.Controllers
     public class AsignaturasController : Controller
     {
         private readonly ApplicationDbContext context;
-        public AsignaturasController(ApplicationDbContext context)
+        private readonly UserManager<IdentityUser> userManager;
+        public AsignaturasController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             this.context = context;
+            this.userManager = userManager;
         }
 
 
@@ -61,12 +63,14 @@ namespace LBMNotas.Controllers
         public IActionResult CrearAsignaturas(int IdCurso)
         {
             var modelo = new AsignaturaCreateViewModel();
+            var listaprofes = userManager.GetUsersInRoleAsync("profesor");
             modelo.CursoId = IdCurso;
+            modelo.ListaProfes = listaprofes.Result.Select(u => u).ToList(); ;
             return View(modelo);
         }
 
         [HttpPost]
-        public IActionResult CrearAsignaturas(AsignaturaCreateViewModel model)
+        public IActionResult CrearAsignaturas(AsignaturaCreateViewModel model, string listaProfesores)
         {
             if (ModelState.IsValid)
             {
@@ -79,6 +83,14 @@ namespace LBMNotas.Controllers
                 context.Asignaturas.Add(nuevaAsignatura);
                 context.SaveChanges();
 
+                var profeasignatura = new ProfesorAsignatura
+                {
+                    AsignaturasId = nuevaAsignatura.Id,
+                    UserId = listaProfesores
+                };
+
+                context.ProfesorAsignatura.Add(profeasignatura);
+                context.SaveChanges();
                 foreach (var unidadViewModel in model.Unidades)
                 {
                     var nuevaUnidad = new Unidades
@@ -103,6 +115,8 @@ namespace LBMNotas.Controllers
                         context.Etapas.Add(nuevaEtapa);
                     }
                 }
+
+                
 
                 context.SaveChanges();
 

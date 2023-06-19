@@ -7,7 +7,7 @@
         public List<Unidades> Unidades { get; set; }
         public int CursosId { get; set; }
         public Cursos Cursos { get; set; }
-        public List<ProfesorAsignatura> ProfesorAsignaturas { get; set; } 
+        public List<ProfesorAsignatura> ProfesorAsignaturas { get; set; }
 
     }
 }

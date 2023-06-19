@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel;
 
 namespace LBMNotas.Models
 {
@@ -10,6 +11,8 @@ namespace LBMNotas.Models
         public int CursoId { get; set; }
         public List<string> EtapasPredefinidas { get; set; }
         public int TotalPorcentaje { get; set; }
+        [DisplayName("Listado de Profesores")]
+        public List<IdentityUser> ListaProfes { get; set; }
 
         public AsignaturaCreateViewModel()
         {

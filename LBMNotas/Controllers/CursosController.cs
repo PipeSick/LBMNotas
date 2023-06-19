@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.HSSF.UserModel;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using Microsoft.VisualBasic;
 
 namespace LBMNotas.Controllers
 {

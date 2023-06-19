@@ -82,18 +82,22 @@ namespace LBMNotas.Controllers
 
             }
 
-            var resultado = await signInManager.PasswordSignInAsync(modelo.Email,
-                modelo.Password, modelo.RememberMe, lockoutOnFailure: false);
+            var usuario = context.Users.FirstOrDefault(u => u.Email == modelo.Email);
 
+            var resultado = await signInManager.PasswordSignInAsync(usuario, modelo.Password, modelo.RememberMe, lockoutOnFailure: false);
+            // Si las credenciales son correctas, se va al home.
             if (resultado.Succeeded)
             {
                 return RedirectToAction("Index", "Home");
             }
+            //si no devuelve error.
             else
             {
                 ModelState.AddModelError(string.Empty, "Correo o contraseña Incorrectos.");
                 return View(modelo);
-            }
+            }   
+
+                
         }
 
         [HttpPost]
@@ -227,7 +231,7 @@ namespace LBMNotas.Controllers
         public async Task<IActionResult> Listado(string mensaje = null, int pagina = 1)
         {
             {
-                int pageSize = 3; // Número de elementos por página
+                int pageSize = 5; // Número de elementos por página
                 var roles = await context.Roles.ToListAsync();
                 var usuarios = await context.Users
                     .OrderByDescending(x => x.LockoutEnabled)
@@ -264,7 +268,6 @@ namespace LBMNotas.Controllers
                     });
                 }
 
-               // resultado = resultado.OrderByDescending(u => u.Estado).ToList();
                 var modelo = new UsuariosListadoViewModel();
                 modelo.PaginaActual = pagina;
                 modelo.RegistrosPorPagina = pageSize;

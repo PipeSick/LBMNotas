@@ -1,5 +1,6 @@
 ﻿@model CursosListadoViewModel
-
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
 @{
     ViewData["Title"] = "Inicio";
     Layout = "../shared/_Layout";
@@ -10,7 +11,7 @@
 
 <form class="filter-form" method="get">
     <label for="year">Seleccione el año:</label>
-    <select id="year" name="year">
+    <select id="year" name="year" onchange="actualizarFiltro()">
         <option value="2023" selected="@(Model.añoseleccionado == 2023)">2023</option>
         <option value="2024" selected="@(Model.añoseleccionado == 2024)">2024</option>
         <option value="2025" selected="@(Model.añoseleccionado == 2025)">2025</option>
@@ -18,11 +19,15 @@
     <button asp-action="Index" type="submit">Filtrar</button>
 </form>
 
-@if (Model.CursosListado.Count == 0)
+@if (Model.CursosListado.Count == 0 || Model.CursosListado == null)
 {
     <div class="text-center">
-        <p class="text-muted">Aún no se han agregado cursos para el año seleccionado.</p>
-        <a asp-action="Index" asp-controller="Cursos" class="btn btn-primary">Agregar Curso</a>
+        <p class="text-muted" style="margin-top:20px">Aún no se han agregado cursos para el año seleccionado.</p>
+        @if (User.IsInRole("admin"))
+        {
+            <a asp-action="Index" asp-controller="Cursos" class="btn btn-primary">Agregar Curso</a>
+        }
+
     </div>
 }
 else
@@ -64,7 +69,7 @@ else
                                                 <thead>
                                                     <tr>
                                                         <th>Asignatura</th>
-                                                        <th style="width: 30px;">Acciones</th>
+                                                        <th style="width: auto; text-align:end">Acciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -73,20 +78,25 @@ else
                                                         
                                                         <tr>
                                                             <td>@asignaturas.Nombre</td>
-                                                            <td class="text-center">
-                                                                                <a asp-action="AsignaturasIndex" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id" asp-route-IdCurso="@curso.Id"><i class="material-icons">settings</i></a>
-                                                                <a asp-action="VistaNotasFinalesUnidad" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id" asp-route-IdCurso="@curso.Id"><i class="material-icons">edit</i></a>
+                                                            <td style="text-align:end">
+                                                                <a class="btn btn-primary" asp-action="AsignaturasIndex" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id" asp-route-IdCurso="@curso.Id"> Ver Notas Por Unidades</a>
+                                                                <a class="btn btn-success" asp-action="VistaNotasFinalesUnidad" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id" asp-route-IdCurso="@curso.Id">Ver Notas Finales</a>
                                                              </td> <!-- Icono de tuerca de Material Design -->
 
                                                         </tr>
                                                     }
                                                 </tbody>
                                                 <tfoot>
-                                                    <tr>
-                                                        <td colspan="2" class="text-end">
-                                                            <a class="btn btn-primary" asp-action="CrearAsignaturas" asp-controller="Asignaturas" asp-route-IdCurso="@curso.Id">Agregar Asignatura</a>
-                                                        </td>
-                                                    </tr>
+                                                    @if (User.IsInRole("admin"))
+                                                    {
+                                                        <tr>
+                                                            <td colspan="2" class="text-end">
+                                                                <a class="btn btn-primary" asp-action="CrearAsignaturas" asp-controller="Asignaturas" asp-route-IdCurso="@curso.Id">Agregar Asignatura</a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                    
                                                 </tfoot>
                                             </table>
 
@@ -146,9 +156,13 @@ else
             index++; // Incrementar el índice único para el siguiente acordeón
         }
     </div>
-    <div class="text-center m-4">
-        <a asp-action="Index" asp-controller="Cursos" class="btn btn-primary">Agregar Curso</a>
-    </div>
+    @if (User.IsInRole("admin"))
+    {
+        <div class="text-center m-4">
+            <a asp-action="Index" asp-controller="Cursos" class="btn btn-primary">Agregar Curso</a>
+        </div>
+    }
+
 
 }
 
@@ -191,3 +205,10 @@ else
             }
 </style>
 
+<script>
+    function actualizarFiltro() {
+        var select = document.getElementById("unidad");
+        var selectedOption = select.options[select.selectedIndex].text;
+        localStorage.setItem("selectedOption", selectedOption);
+    }
+</script>

@@ -24,7 +24,9 @@ builder.Services.AddAuthentication().AddGoogle(opciones =>
 });
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opciones =>
 {
+    opciones.SignIn.RequireConfirmedEmail = false;
     opciones.SignIn.RequireConfirmedAccount = false;
+    opciones.SignIn.RequireConfirmedPhoneNumber = false;
 }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, opciones =>

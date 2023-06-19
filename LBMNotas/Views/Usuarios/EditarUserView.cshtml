@@ -28,6 +28,9 @@
                     <label asp-for="Contraseña" class="form-label"></label>
                     <input asp-for="Contraseña" class="form-control" />
                 </div>
+                <div id="passwordAlert" class="alert alert-danger" style="display: none;">
+                    La contraseña debe tener al menos 8 caracteres y contener una combinación de letras mayúsculas, letras minúsculas, números y caracteres especiales.
+                </div>
                 
                 <div class="mb-3">
                     <label asp-for="Roles" class="form-label"></label>
@@ -37,7 +40,7 @@
                     </select>
                 </div>
                 <div class="d-flex justify-content-end">
-                    <button class="btn btn-primary">Editar Usuario</button>
+                    <button class="btn btn-primary" >Editar Usuario</button>
                 </div>
             </form>
         </div>
@@ -45,5 +48,41 @@
 </div>
 
 @section Scripts{
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial" />    
+    <script>
+        $(document).ready(function () {
+            $('#passwordAlert').hide(); // Oculta la alerta de contraseña inicialmente
+            
+            $('form').submit(function (event) {
+                var contraseña = $('#Contraseña').val();
+                
+                if (!validarContraseña(contraseña)) {
+                    $('#passwordAlert').show(); // Muestra la alerta de contraseña si no cumple con los requisitos
+                    event.preventDefault(); // Detiene el envío del formulario
+                }
+            });
+            
+            function validarContraseña(contraseña) {
+                // Requisitos de la contraseña
+                var longitudMinima = 8;
+                var tieneMayuscula = /[A-Z]/.test(contraseña);
+                var tieneMinuscula = /[a-z]/.test(contraseña);
+                var tieneNumero = /\d/.test(contraseña);
+                var tieneCaracterEspecial = /[!#$%^&*]/.test(contraseña);
+                
+                // Verifica que la contraseña cumpla con los requisitos
+                if (
+                    contraseña.length >= longitudMinima &&
+                    tieneMayuscula &&
+                    tieneMinuscula &&
+                    tieneNumero &&
+                    tieneCaracterEspecial
+                ) {
+                    return true; // La contraseña cumple con los requisitos
+                } else {
+                    return false; // La contraseña no cumple con los requisitos
+                }
+            }
+        });
+    </script>
 }

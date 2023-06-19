@@ -15,24 +15,13 @@ namespace LBMNotas.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
           
+            modelBuilder.Entity<ProfesorAsignatura>()
+           .HasKey(pa => new { pa.UserId, pa.AsignaturasId });
 
             modelBuilder.Entity<ProfesorAsignatura>()
-                .HasKey(ap => new { ap.AsignaturasId, ap.ProfesoresId });
-
-            modelBuilder.Entity<ProfesorAsignatura>()
-                .HasOne(ap => ap.Asignaturas)
-                .WithMany(a => a.ProfesorAsignaturas)
-                .HasForeignKey(ap => ap.AsignaturasId);
-
-            modelBuilder.Entity<ProfesorAsignatura>()
-                .HasOne(ap => ap.Profesores)
-                .WithMany(p => p.ProfesoresAsignaturas)
-                .HasForeignKey(ap => ap.ProfesoresId);
-
-
-
-
-
+                .HasOne(pa => pa.User)
+                .WithMany()
+                .HasForeignKey(pa => pa.UserId);
 
 
 

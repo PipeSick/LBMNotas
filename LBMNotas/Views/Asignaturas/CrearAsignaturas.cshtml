@@ -32,6 +32,20 @@
             <input asp-for="nombreasignatura" class="form-control" />
             <span asp-validation-for="nombreasignatura" class="text-danger"></span>
         </div>
+
+
+        <div class=" form-group" style="margin-top:20px">
+            <label class="control-label">Seleccione el profesor:</label>
+            <select id="IdProfe" name="listaProfesores">
+                <option disabled selected>---Seleccione Profesor---</option>
+                @foreach (var profesor in Model.ListaProfes)
+                {
+                    <option value="@profesor.Id">@profesor.UserName</option>
+                }
+            </select>
+        </div>
+
+        
         <div class="form-group">
             <input asp-for="CursoId" value="@Model.CursoId" hidden>
         </div>
