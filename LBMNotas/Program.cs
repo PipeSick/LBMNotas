@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using DinkToPdf;
+using DinkToPdf.Contracts;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,9 @@ var politicaUsuariosAutenticados = new AuthorizationPolicyBuilder()
     .Build();
 
 // Add services to the container.
+
+
+
 builder.Services.AddControllersWithViews( opciones =>
 {
     opciones.Filters.Add(new AuthorizeFilter(politicaUsuariosAutenticados));
@@ -51,6 +57,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 
 app.MapControllerRoute(

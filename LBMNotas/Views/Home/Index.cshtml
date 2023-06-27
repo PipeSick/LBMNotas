@@ -140,7 +140,9 @@ else
                                                             <td>@alumnos.Rut</td>
                                                             <td>@alumnos.NombreCompleto</td>                                                         
 
-                                                            <td class="text-center"><i class="material-icons">settings</i></td> <!-- Icono de tuerca de Material Design -->
+                                                            <td class="text-center">
+                                                                <a asp-action="AlumnoResumenView" asp-controller="Alumnos" asp-route-IdAlumno="@alumnos.Id"><i class="material-icons">settings</i> </a>
+                                                                </td> <!-- Icono de tuerca de Material Design -->
                                                         </tr>
                                                     }
                                                 </tbody>                                               

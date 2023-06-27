@@ -1,0 +1,128 @@
+﻿@model AlumnoResumenViewModel
+
+<h2 class="font-monospace text-center">Resumen de notas del alumno: @Model.Alumnos.NombreCompleto</h2>
+<h2 class="font-monospace text-end">Curso: @Model.Cursos.Nombre</h2>
+
+<form method="post" asp-action="MostrarPDFenPagina" asp-controller="Alumnos">
+    <input type="hidden" name="IdAlumno" value="@Model.Alumnos.Id" />
+    <button type="submit">Exportar a PDF</button>
+</form>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr class="text-center">
+            <th>Asignatura</th>
+            <th>Unidades</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var asignatura in Model.Asignaturas)
+        {
+            <tr>
+                <td style="vertical-align:central">@asignatura.Nombre</td>
+                <td>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nombre Unidad</th>
+                                <th>Descripción Unidad</th>
+                                <th>Etapas</th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            
+                            @foreach (var unidad in Model.Unidades.Where(u => u.AsignaturasID == asignatura.Id))
+                            {
+                                <tr>
+                                    <td>@unidad.Nombre</td>
+                                    <td>@unidad.Descripcion</td>
+                                    <td>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Etapa</th>
+                                                    <th>Nota</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var etapa in Model.Etapas.Where(e => e.UnidadesId == unidad.Id))
+                                                {
+                                                    <tr>
+                                                        <td>@etapa.Nombre</td>
+                                                        <td>
+                                                            <ul class="list-unstyled">
+                                                                @foreach (var nota in Model.calificacionAlumnos.Where(n => n.EtapaId == etapa.Id))
+                                                                {
+                                                                    <li>@nota.Nota</li>
+                                                                }
+                                                            </ul>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td><strong>Promedio:</strong></td>
+                                                    <td>
+                                                        <ul class="list-unstyled">
+                                                            @foreach (var promedio in Model.NotaFinalUnidad.Where(pr => pr.UnidadId == unidad.Id))
+                                                            {
+                                                                <li>@promedio.NotaFinal</li>
+                                                            }
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </td>                                    
+                                </tr>
+                            }
+                            
+                        </tbody>
+                        
+                    </table>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<style>
+    .table-fixed-layout {
+        table-layout: fixed;
+        height: 100%;
+        display: block;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .etapa-box {
+        height: 100%;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+        .container h4 {
+            margin-bottom: 10px;
+        }
+
+        .container table {
+            margin-bottom: 20px;
+        }
+
+        .container ul {
+            padding: 0;
+            margin: 0;
+        }
+
+            .container ul li {
+                list-style-type: none;
+            }
+
+</style>
