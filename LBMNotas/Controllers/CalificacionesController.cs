@@ -2,6 +2,7 @@
 using LBMNotas.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.Util;
 
 namespace LBMNotas.Controllers
@@ -94,6 +95,26 @@ namespace LBMNotas.Controllers
                 // Manejar la excepción y proporcionar una respuesta adecuada
                 return StatusCode(500, "Ocurrió un error al guardar los promedios. Detalles: " + ex.Message);
             }
+        }
+
+        [HttpPost]
+        public ActionResult GuardarComentarios(int alumnoId, int unidadId, string comentario)
+        {
+
+
+                // Buscar el registro del comentario existente o crear uno nuevo
+                var comentarios = context.NotaFinalUnidad.FirstOrDefault(c => c.AlumnoId == alumnoId && c.UnidadId == unidadId);
+                if (comentarios != null)
+                {
+                    comentarios.Comentarios = comentario;
+                    context.SaveChanges();
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+
         }
 
     }

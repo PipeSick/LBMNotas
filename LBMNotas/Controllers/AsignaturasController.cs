@@ -32,6 +32,8 @@ namespace LBMNotas.Controllers
             var AsignaturaDatos = context.Asignaturas.Where(a => a.Id == IdAsignatura).FirstOrDefault();
             var ListaUnidades = context.Unidades.Where(u => u.AsignaturasID == IdAsignatura).ToList();
             var ListaCompletaEtapas = new List<Etapas>();
+
+            var listacomentarios = new List<NotaFinalUnidad>();
             if (ListaUnidades is null)
             {
                 return NotFound();
@@ -40,12 +42,18 @@ namespace LBMNotas.Controllers
             foreach (var unidad in ListaUnidades)
             {
                 var ListaEtapasUnidad = context.Etapas.Where(e => e.UnidadesId == unidad.Id).ToList();
+                foreach (var alumno in ListaAlumnos)
+                {
+                    var comentarios = context.NotaFinalUnidad.Where(nf => nf.AlumnoId == alumno.Id && nf.UnidadId == unidad.Id).ToList();
+                    listacomentarios.AddRange(comentarios);
+                }
                 ListaCompletaEtapas.AddRange(ListaEtapasUnidad);
             }
             if (AsignaturaDatos == null) 
             {
                 return NotFound();
             }
+
 
             var calificaciones = context.calificacionAlumnos.ToList();
 
@@ -135,11 +143,12 @@ namespace LBMNotas.Controllers
                 .ToList();
             var Unidad = context.Unidades.Where(u => u.Id == IdUnidad).FirstOrDefault();
             var ListaUnidades = context.Unidades.Where(u => u.AsignaturasID == IdAsignatura).ToList();
+
             var ListaEtapasUnidad = context.Etapas.Where(e => e.UnidadesId == IdUnidad).ToList();
-
-
+            var listacomentarios = context.NotaFinalUnidad.Where(nf => nf.UnidadId == IdUnidad).ToList();
             var calificaciones = context.calificacionAlumnos.ToList();
 
+            modelo.NotaFinalUnidads = listacomentarios;
             modelo.calificacions = calificaciones;
             modelo.Asignaturas = AsignaturaDatos;
             modelo.IdCurso = IdCurso;

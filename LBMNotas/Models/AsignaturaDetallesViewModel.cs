@@ -2,6 +2,7 @@
 {
     public class AsignaturaDetallesViewModel
     {
+        public List<NotaFinalUnidad> NotaFinalUnidads { get; set; }
         public List<Etapas> Etapas { get; set; }
         public List<Unidades> Unidades { get; set; }
         public List<Alumnos> Alumnos { get; set; }

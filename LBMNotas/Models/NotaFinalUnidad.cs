@@ -7,6 +7,7 @@
         public int AlumnoId { get; set; }
         public Alumnos Alumno { get; set; }
         public float NotaFinal { get; set; }
+        public string Comentarios { get; set; }
         public Unidades Unidad { get; set; }
     }
 }

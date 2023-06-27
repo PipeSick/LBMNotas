@@ -169,6 +169,9 @@ namespace LBMNotas.Migrations
                     b.Property<int>("AlumnoId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Comentarios")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<float>("NotaFinal")
                         .HasColumnType("real");
 

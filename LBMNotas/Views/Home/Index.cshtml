@@ -128,7 +128,7 @@ else
                                                         <th>#</th>
                                                         <th>Rut</th>
                                                         <th>Nombre Completo</th>
-                                                        <th style="width: 30px;">Acciones</th>
+                                                        <th style="text-align:end">Acciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -140,9 +140,9 @@ else
                                                             <td>@alumnos.Rut</td>
                                                             <td>@alumnos.NombreCompleto</td>                                                         
 
-                                                            <td class="text-center">
-                                                                <a asp-action="AlumnoResumenView" asp-controller="Alumnos" asp-route-IdAlumno="@alumnos.Id"><i class="material-icons">settings</i> </a>
-                                                                </td> <!-- Icono de tuerca de Material Design -->
+                                                            <td class="text-end">
+                                                                <a class="btn btn-primary"asp-action="AlumnoResumenView" asp-controller="Alumnos" asp-route-IdAlumno="@alumnos.Id">Descargar Resumen Alumno</a>
+                                                                </td> 
                                                         </tr>
                                                     }
                                                 </tbody>                                               

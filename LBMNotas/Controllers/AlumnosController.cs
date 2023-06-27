@@ -2,25 +2,22 @@
 using LBMNotas.Context;
 using LBMNotas.Models;
 using Microsoft.AspNetCore.Mvc;
-using DinkToPdf;
-using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using LBMNotas.Servicios;
+using Rotativa.AspNetCore;
 
 namespace LBMNotas.Controllers
 {
     public class AlumnosController : Controller
     {
         private readonly ApplicationDbContext context;
-        private readonly IConverter _converter;
 
-        public AlumnosController(ApplicationDbContext context, IConverter converter)
+        public AlumnosController(ApplicationDbContext context)
         {
             this.context = context;
-            _converter = converter;
         }
-        [Authorize(Roles = Constantes.RolAdmin)]
+
         public IActionResult AlumnoResumenView(int IdAlumno)
         {
             var modelo = new AlumnoResumenViewModel();
@@ -52,68 +49,15 @@ namespace LBMNotas.Controllers
             modelo.NotaFinalUnidad = notasfinalesalumno;
 
 
-            return View(modelo);
-        }
-        public IActionResult MostrarPDFenPagina(int IdAlumno)
-        {
-
-
-            string pagina_actual = HttpContext.Request.Path;
-            string url_pagina = HttpContext.Request.GetEncodedUrl();
-            url_pagina = url_pagina.Replace(pagina_actual, "");
-            url_pagina = $"{url_pagina}/Alumnos/AlumnoResumenView/{IdAlumno}";
-
-
-            var pdf = new HtmlToPdfDocument()
-            {
-                GlobalSettings = new GlobalSettings()
+            return new ViewAsPdf("AlumnoResumenView", modelo)
                 {
-                    PaperSize = PaperKind.A4,
-                    Orientation = Orientation.Portrait
-                },
-                Objects = {
-                    new ObjectSettings(){
-                        Page = url_pagina
-                    }
-                }
+
+                FileName= $"ResumenAlumno.pdf",
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait,
+                PageSize = Rotativa.AspNetCore.Options.Size.A4
 
             };
-
-            var archivoPDF = _converter.Convert(pdf);
-
-
-            return File(archivoPDF, "application/pdf");
         }
-
-        public IActionResult DescargarPDF(int IdAlumno)
-        {
-            string pagina_actual = HttpContext.Request.Path;
-            string url_pagina = HttpContext.Request.GetEncodedUrl();
-            url_pagina = url_pagina.Replace(pagina_actual, "");
-            url_pagina = $"{url_pagina}/Alumnos/AlumnoResumenView";
-
-
-            var pdf = new HtmlToPdfDocument()
-            {
-                GlobalSettings = new GlobalSettings()
-                {
-                    PaperSize = PaperKind.A4,
-                    Orientation = Orientation.Portrait
-                },
-                Objects = {
-                    new ObjectSettings(){
-                        Page = url_pagina
-                    }
-                }
-
-            };
-
-            var archivoPDF = _converter.Convert(pdf);
-            string nombrePDF = "reporte_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".pdf";
-
-            return File(archivoPDF, "application/pdf", nombrePDF);
-        }
-
 
     }
 }

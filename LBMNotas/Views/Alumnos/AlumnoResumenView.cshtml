@@ -1,12 +1,28 @@
 ﻿@model AlumnoResumenViewModel
+@{
+    Layout = "../Usuarios/_LayoutLogin";
+}
 
-<h2 class="font-monospace text-center">Resumen de notas del alumno: @Model.Alumnos.NombreCompleto</h2>
-<h2 class="font-monospace text-end">Curso: @Model.Cursos.Nombre</h2>
+<div style="margin:40px;">
+    <img src="/Images/lbm.jpeg" style="width: 100px; height:auto; position:absolute; top:0;right:0;" />
+    <h1 class="text-center" style="align-items:center">
+        Resumen de notas LBM.
+    </h1>
+</div>
 
-<form method="post" asp-action="MostrarPDFenPagina" asp-controller="Alumnos">
-    <input type="hidden" name="IdAlumno" value="@Model.Alumnos.Id" />
-    <button type="submit">Exportar a PDF</button>
-</form>
+
+
+
+
+<table class="table horizontal-table" style="margin-top:10px">
+    <tbody>
+        <tr>
+            <td><strong>Nombre:</strong> @Model.Alumnos.NombreCompleto</td>
+            <td><strong>Curso:</strong> @Model.Cursos.Nombre</td>
+            <td><strong>Fecha:</strong>@DateTime.Now.ToShortDateString()</td>
+        </tr>
+    </tbody>
+</table>
 
 
 <table class="table table-bordered">
@@ -90,6 +106,17 @@
 
 
 <style>
+    .horizontal-table {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+    }
+
+        .horizontal-table td {
+            padding: 10px;
+        }
     .table-fixed-layout {
         table-layout: fixed;
         height: 100%;
@@ -125,4 +152,4 @@
                 list-style-type: none;
             }
 
-</style>
+ </style>

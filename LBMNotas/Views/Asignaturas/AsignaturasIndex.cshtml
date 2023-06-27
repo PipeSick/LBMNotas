@@ -72,6 +72,7 @@
                             <th rowspan="2" class="table-header" style="vertical-align:middle">Rut</th>
                             <th colspan="@Model.Etapas.Count" class="table-header table-header-etapas" style="vertical-align:middle; text-align:center;">Etapas</th>
                             <th rowspan="2" class="table-header" style="vertical-align:middle">Nota Final</th>
+                            <th rowspan="2" class="table-header" style="vertical-align:middle">Comentarios</th>
                         </tr>
                         <tr>
                             @foreach (var listaetapas in Model.Etapas)
@@ -105,6 +106,15 @@
                                 <td class="table-cell">
                                     <input id="NotaFinal-@listaalumnos.Id" type="text" class="form-control promedio-input" style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center">
                                 </td>
+
+                                    @{var comentariosvalidate = Model.NotaFinalUnidads != null && Model.NotaFinalUnidads.Any(c => c.AlumnoId == listaalumnos.Id && c.UnidadId == Model.Unidad.Id) ? Model.NotaFinalUnidads.FirstOrDefault(c => c.AlumnoId == listaalumnos.Id && c.UnidadId == Model.Unidad.Id) : null;
+                                    var comentariosfinal = comentariosvalidate != null ? comentariosvalidate.Comentarios : (string?)null;
+                                    <td style="vertical-align:middle">
+                                        <textarea id="comentario-@listaalumnos.Id" class="form-control comentario-input custom-textarea" data-alumno-id="@listaalumnos.Id" data-unidad-id="@Model.Unidad.Id">@comentariosfinal</textarea>
+
+                                    </td>
+                                }
+
                             </tr>
                         }
                     </tbody>
@@ -129,6 +139,12 @@
         padding: 10px;
         border: 1px solid #ced4da;
         border-radius: 5px;
+    }
+
+    .custom-textarea {
+        width: 100%; /* Ancho del textarea */
+        height: 100px; /* Altura del textarea */
+        resize: both; /* Permite redimensionar verticalmente el textarea */
     }
 </style>
 
@@ -169,8 +185,34 @@
                     console.log(errorMessage); // Muestra el mensaje de error en la consola
                 }
             });
+        });
+    });
 
+    //Funcion para guardar los comentarios en la base de datos.
+    $(document).ready(function () {
+        $('.comentario-input').on('blur', function () {
+            var textarea = $(this);
+            var alumnoId = textarea.data('alumno-id');
+            var unidadId = textarea.data('unidad-id');
+            var comentario = textarea.val();
 
+            // Envía una solicitud al servidor para guardar el comentario
+            $.ajax({
+                url: '/Calificaciones/GuardarComentarios',
+                method: 'POST',
+                data: {
+                    AlumnoId: alumnoId,
+                    UnidadId: unidadId,
+                    Comentario: comentario
+                },
+                success: function (response) {
+                    
+                },
+                error: function (xhr, status, error) {
+                    var errorMessage = xhr.responseText || error;
+                    console.log(errorMessage);
+                }
+            });
         });
     });
 
@@ -239,7 +281,6 @@
                     Alumnos: data.Alumnos
                 },
                 success: function (response) {
-                    console.log('Promedios guardados correctamente');
                 },
                 error: function (xhr, status, error) {
                     var errorMessage = xhr.responseText || error;
@@ -332,34 +373,6 @@
         }
     });
 
-    function exportarPDF() {
-        var unidadSelect = document.getElementById('unidad');
-        var unidadNombre = unidadSelect.options[unidadSelect.selectedIndex].text;
-
-        // Obtén el valor del nombre de la asignatura desde el modelo
-        var asignaturaNombre = '@Model.Asignaturas.Nombre';
-
-
-        // Concatenar los nombres de la asignatura y la unidad para formar el nombre del archivo
-        var nombreArchivo = asignaturaNombre + '_' + unidadNombre + '.pdf';
-        // Crea un objeto jsPDF
-        var doc = new jsPDF();
-
-        // Obtiene la tabla por su ID
-        var table = document.getElementById("TablaNotas");
-
-        // Convierte la tabla en formato de datos para jsPDF
-        var data = doc.autoTableHtmlToJson(table);
-
-        // Genera el PDF
-        doc.autoTable({
-            head: [data.columns],
-            body: data.rows,
-        });
-
-        // Guarda el archivo PDF
-        doc.save(nombreArchivo);
-    }
 
 </script>
 
