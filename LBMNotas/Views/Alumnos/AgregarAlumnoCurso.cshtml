@@ -1,0 +1,43 @@
+﻿@model LBMNotas.Models.Alumnos
+
+@{
+    ViewData["Title"] = "AgregarAlumnoCurso";
+}
+
+
+<h1 class="text-center">Agregar Alumno al Curso: @ViewBag.NombreCurso</h1>
+
+
+<hr />
+<div class="row justify-content-center text-center align-content-center">
+    <div class="col-md-4">
+        <form asp-action="GuardarNuevoAlumno">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input name="IdCurso" value="@ViewBag.IdCurso" hidden />
+            <div class="form-group mt-3">
+                <label asp-for="NumeroLista" class="control-label"></label>
+                <input asp-for="NumeroLista" class="form-control mt-2" value="@ViewBag.NumeroLista" />
+                <span asp-validation-for="NumeroLista" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <label asp-for="Rut" class="control-label"></label>
+                <input asp-for="Rut" class="form-control mt-2" />
+                <span asp-validation-for="Rut" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <label asp-for="NombreCompleto" class="control-label"></label>
+                <input asp-for="NombreCompleto" class="form-control mt-2" />
+                <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-5">
+                <input type="submit" value="Agregar Alumno" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

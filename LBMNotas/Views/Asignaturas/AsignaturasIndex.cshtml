@@ -94,17 +94,27 @@
                                 @foreach (var listaetapas in Model.Etapas)
                                 {
                                     var calificacion = Model.calificacions != null && Model.calificacions.Any(c => c.AlumnoId == listaalumnos.Id && c.EtapaId == listaetapas.Id) ? Model.calificacions.FirstOrDefault(c => c.AlumnoId == listaalumnos.Id && c.EtapaId == listaetapas.Id) : null;
-                                    var notas = calificacion != null ? calificacion.Nota : (float?)null;                                      
+                                    var notas = calificacion != null ? calificacion.Nota : (float?)null;
 
+                                    if (User.IsInRole("tutor"))
+                                    {
+                                        <td class="table-cell">
+                                            <input id="nota-@listaalumnos.Id-@listaetapas.Id" type="text" class="form-control nota-input" data-alumno-id="@listaalumnos.Id" data-etapa-id="@listaetapas.Id" data-peso="@listaetapas.Porcentaje" value="@notas" disabled style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center;text-transform:uppercase;">
+
+                                        </td>
+                                    }else
+                                    {
+                                        <td class="table-cell">
+                                            <input id="nota-@listaalumnos.Id-@listaetapas.Id" type="text" class="form-control nota-input" data-alumno-id="@listaalumnos.Id" data-etapa-id="@listaetapas.Id" data-peso="@listaetapas.Porcentaje" value="@notas" style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center;text-transform:uppercase;">
+
+                                        </td>
+                                    }
                                         
-                                    <td class="table-cell">
-                                        <input id="nota-@listaalumnos.Id-@listaetapas.Id" type="text" class="form-control nota-input" data-alumno-id="@listaalumnos.Id" data-etapa-id="@listaetapas.Id" data-peso="@listaetapas.Porcentaje" value="@notas" style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center;text-transform:uppercase;">
 
-                                    </td>
                                 }
                                 
                                 <td class="table-cell">
-                                    <input id="NotaFinal-@listaalumnos.Id" type="text" class="form-control promedio-input" style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center">
+                                    <input id="NotaFinal-@listaalumnos.Id" type="text" class="form-control promedio-input" disabled style="width:50px;height:50px;font-size:10px;margin:auto;color:black;text-align:center">
                                 </td>
 
                                     @{var comentariosvalidate = Model.NotaFinalUnidads != null && Model.NotaFinalUnidads.Any(c => c.AlumnoId == listaalumnos.Id && c.UnidadId == Model.Unidad.Id) ? Model.NotaFinalUnidads.FirstOrDefault(c => c.AlumnoId == listaalumnos.Id && c.UnidadId == Model.Unidad.Id) : null;

@@ -28,7 +28,7 @@ namespace LBMNotas.Controllers
         public async Task<IActionResult> Index(int year = 2023)
         {
             var usuario = await userManager.GetUserAsync(User);
-            if (userManager.IsInRoleAsync(usuario, "admin").Result)
+            if (userManager.IsInRoleAsync(usuario, "admin").Result || userManager.IsInRoleAsync(usuario,"tutor").Result)
             {
                 var listacursos = context.Cursos.Where(c => c.Año == year).ToList();
 

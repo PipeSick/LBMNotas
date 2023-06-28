@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace LBMNotas.Models
 {
@@ -6,9 +7,11 @@ namespace LBMNotas.Models
     {
         [Key]
         public int Id { get; set; }
+        [Display(Name = "Número de Lista")]
         public int NumeroLista { get; set; }
         public string Rut { get; set; }
         [Required]
+        [Display(Name = "Nombre Completo")]
         public string NombreCompleto { get; set; }
 
         // Propiedad de navegación hacia el curso del alumno.

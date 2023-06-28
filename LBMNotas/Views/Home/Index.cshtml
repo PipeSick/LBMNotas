@@ -145,7 +145,19 @@ else
                                                                 </td> 
                                                         </tr>
                                                     }
-                                                </tbody>                                               
+                                                </tbody>
+                                                <tfoot>
+                                                    @if (User.IsInRole("admin"))
+                                                    {
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                <a class="btn btn-primary" asp-action="AgregarAlumnoCurso" asp-controller="Alumnos" asp-route-IdCurso="@curso.Id">Agregar Alumno</a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+
+                                                </tfoot>
                                             </table>
                                         }
                                 </div>

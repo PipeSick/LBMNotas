@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using LBMNotas.Servicios;
 using Rotativa.AspNetCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace LBMNotas.Controllers
 {
@@ -59,5 +60,45 @@ namespace LBMNotas.Controllers
             };
         }
 
+
+        public IActionResult AgregarAlumnoCurso(int idCurso)
+        {
+            var ListaIdsAlumnos = context.alumnoCursos.Where(c => c.CursosId == idCurso).ToList();
+            var datoscurso = context.Cursos.Where(cu => cu.Id == idCurso).FirstOrDefault();
+            var ultimoalumno = ListaIdsAlumnos.Last();
+            var DatosUltimoAlumno = context.Alumnos.Where(a => a.Id == ultimoalumno.AlumnosId).FirstOrDefault();
+            var NuevoNroLista = DatosUltimoAlumno.NumeroLista + 1;
+            ViewBag.NombreCurso = datoscurso.Nombre;
+            ViewBag.IdCurso = idCurso;
+            ViewBag.NumeroLista = NuevoNroLista;
+            return View();
+        }
+
+        public IActionResult GuardarNuevoAlumno(Alumnos alumno, int IdCurso)
+        {
+            if (ModelState.IsValid)
+            {
+                var nuevoalumno = new Alumnos()
+                {
+                    NumeroLista = alumno.NumeroLista,
+                    Rut = alumno.Rut,
+                    NombreCompleto = alumno.NombreCompleto
+                };
+                context.Alumnos.Add(nuevoalumno);
+                context.SaveChanges();
+
+                var asignarcurso = new AlumnoCurso()
+                {
+                    AlumnosId = nuevoalumno.Id,
+                    CursosId = IdCurso
+                };
+
+                context.alumnoCursos.Add(asignarcurso);
+                context.SaveChanges() ;
+                return RedirectToAction("Index", "Home");
+            }
+
+            return NotFound();
+        }
     }
 }

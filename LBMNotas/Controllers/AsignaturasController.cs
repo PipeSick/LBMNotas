@@ -84,6 +84,7 @@ namespace LBMNotas.Controllers
             {
                 var nuevaAsignatura = new Asignaturas
                 {
+                 
                     Nombre = model.nombreasignatura,
                     CursosId = model.CursoId
                 };
