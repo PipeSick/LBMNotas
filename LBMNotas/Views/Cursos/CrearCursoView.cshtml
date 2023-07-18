@@ -21,25 +21,14 @@
                 <label asp-for="Año" class="control-label"></label>
                 <input asp-for="Año" class="form-control" />
                 <span asp-validation-for="Año" class="text-danger"></span>
-            </div>
-            <div class="row mt-3">
-                <div class="col">
-                    <a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Volver al listado</a>
-                </div>
-                <div class="col ">
-                    <div class="form-group">
-                        <button class="btn btn-primary" asp-action="GuardarCurso">Guardar Cursos</button>
-                    </div>
-                </div>
-
-            </div>
+            </div>     
             
 
     </div>
     <div class="col-md-7">
         <div class="row ">
             <div class="col justify-content-end">
-                <div class="card">
+                <div class="card" style="margin-top:15px">
                     <div class="card-header text-center">Cargar Excel Con Alumnos</div>
                     <div class="card-body">
                         <div class="row">
@@ -47,8 +36,7 @@
                                     <input class="form-control-file" type="file" id="ArchivoExcel" name="ArchivoExcel" />
                             </div>
                             <div class="col-sm-6">
-                                <button class="btn btn-warning" id="btnCargarDatos" onclick="mostrarDatos()">Mostrar Datos</button>
-                                <button class="btn btn-success" asp-action="GuardarCurso">Enviar Datos a BD</button>
+                                <a class="btn btn-warning" id="btnCargarDatos" onclick="mostrarDatos()">Mostrar Datos</a>
                             </div>
                         </div>
                         <hr />
@@ -72,6 +60,17 @@
             </div>
         </div>
     </div>
+        <div class="row mt-3">
+            <div class="col">
+                <a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Volver al listado</a>
+            </div>
+            <div class="col ">
+                <div class="form-group">
+                    <button class="btn btn-primary" asp-action="GuardarCurso">Guardar Cursos</button>
+                </div>
+            </div>
+
+        </div>
     </form>
 </div>
 
@@ -85,7 +84,7 @@
     <script>
         let cargaRealizada = false;
         function mostrarDatos() {
-            const input = document.getElementById("inputExcel")
+            const input = document.getElementById("ArchivoExcel")
 
             const formData = new FormData()
 

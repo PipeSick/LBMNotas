@@ -208,8 +208,12 @@ namespace LBMNotas.Controllers
                 string rolnuevo = usuario.Roles.FirstOrDefault();
                 await userManager.RemoveFromRolesAsync(user, currentRoles); //Eliminar del antiguo rol.
                 await userManager.AddToRoleAsync(user, rolnuevo); //Agregar al nuevo rol.
-                var token = await userManager.GeneratePasswordResetTokenAsync(user); //generamos un token para actualizar contraseña
-                var resultpassword = await userManager.ResetPasswordAsync(user, token, usuario.Contraseña); //se actualiza la contraseña mediante el token
+                if (usuario.Contraseña != null)
+                {
+                    //el usuario quiere cambiar contraseña.
+                    var token = await userManager.GeneratePasswordResetTokenAsync(user); //generamos un token para actualizar contraseña
+                    var resultpassword = await userManager.ResetPasswordAsync(user, token, usuario.Contraseña); //se actualiza la contraseña mediante el token
+                }               
                 user.UserName = usuario.NombreUsuario;
                 user.Email = usuario.Email;
                 var resultuser = await userManager.UpdateAsync(user);

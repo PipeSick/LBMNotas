@@ -18,21 +18,22 @@ namespace LBMNotas.Controllers
             this.userManager = userManager;
         }
 
-
+        //Carga de la página index de asignaturas, se le pasa el id de la asignatura, y el id del curso al cual pertenece.
         [HttpGet]
         public IActionResult AsignaturasIndex(int IdAsignatura, int IdCurso, int IdUnidad)
         {
-
+            
             var modelo = new AsignaturaDetallesViewModel();
-
+            //se obtienen los alumnos.
             var ListaAlumnos = context.Alumnos
         .Where(a => a.alumnoCursos.Any(ac => ac.CursosId == IdCurso))
         .ToList();
-
+            //se obtienen los datos de la asignatura.
             var AsignaturaDatos = context.Asignaturas.Where(a => a.Id == IdAsignatura).FirstOrDefault();
+            //se obtienen la lista de unidades que posee la asignatura
             var ListaUnidades = context.Unidades.Where(u => u.AsignaturasID == IdAsignatura).ToList();
+            //se crea una nueva lista de etapas.
             var ListaCompletaEtapas = new List<Etapas>();
-
             var listacomentarios = new List<NotaFinalUnidad>();
             if (ListaUnidades is null)
             {

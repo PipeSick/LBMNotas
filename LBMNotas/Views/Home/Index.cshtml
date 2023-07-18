@@ -58,10 +58,12 @@ else
                                         @if (curso.Asignaturas is null || !curso.Asignaturas.Any())
                                         {
                                             <p>El curso aún no posee asignaturas.</p>
-                                            <div>
-                                                <a class="btn btn-primary" asp-action="CrearAsignaturas" asp-controller="Asignaturas" asp-route-IdCurso="@curso.Id">Agregar Asignatura</a>
-                                            </div>
-                                            
+                                            @if (User.IsInRole("admin"))
+                                            {
+                                                <div>
+                                                    <a class="btn btn-primary" asp-action="CrearAsignaturas" asp-controller="Asignaturas" asp-route-IdCurso="@curso.Id">Agregar Asignatura</a>
+                                                </div>
+                                            }
                                         }
                                         else
                                         {
