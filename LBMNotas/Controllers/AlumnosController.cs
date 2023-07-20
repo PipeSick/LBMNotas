@@ -100,5 +100,23 @@ namespace LBMNotas.Controllers
 
             return NotFound();
         }
+
+        public IActionResult EditarAlumno(int IdAlumno)
+        {
+            var alumno = context.Alumnos.Where(a => a.Id == IdAlumno).FirstOrDefault();
+            return View(alumno);
+        }
+
+        public IActionResult GuardarAlumnoEditado(Alumnos alumno)
+        {
+            var alumnoaeditar = context.Alumnos.Find(alumno.Id);
+
+            alumnoaeditar.NombreCompleto = alumno.NombreCompleto;
+            alumnoaeditar.Rut = alumno.Rut;
+            alumnoaeditar.NumeroLista = alumno.NumeroLista;
+            context.SaveChanges();
+            return RedirectToAction("Index", "Home");
+
+        }
     }
 }

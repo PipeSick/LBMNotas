@@ -1,0 +1,67 @@
+﻿@model LBMNotas.Models.Alumnos
+
+@{
+    ViewData["Title"] = "EditarAlumno";
+}
+
+<div style="text-align: center;">
+    <h1>Editar Alumno: @Model.NombreCompleto</h1>
+
+    <hr />
+    <div style="display: inline-block; width:400px;">
+        <form asp-action="GuardarAlumnoEditado" style="text-align: left;">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="NumeroLista" class="control-label"></label>
+                <input asp-for="NumeroLista" class="form-control disabled" />
+                <span asp-validation-for="NumeroLista" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rut" class="control-label"></label>
+                <input asp-for="Rut" class="form-control" />
+                <span asp-validation-for="Rut" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NombreCompleto" class="control-label"></label>
+                <input asp-for="NombreCompleto" class="form-control" />
+                <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary btn-custom">Volver a la lista</a>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Guardar" class="btn btn-primary btn-custom" />
+                </div>
+
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+
+
+<style>
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .btn-custom {
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

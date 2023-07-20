@@ -144,6 +144,10 @@ else
 
                                                             <td class="text-end">
                                                                 <a class="btn btn-primary"asp-action="AlumnoResumenView" asp-controller="Alumnos" asp-route-IdAlumno="@alumnos.Id">Descargar Resumen Alumno</a>
+                                                                @if (User.IsInRole("admin"))
+                                                                {
+                                                                   <a class="btn btn-primary" asp-action="EditarAlumno" asp-controller="Alumnos" asp-route-IdAlumno="@alumnos.Id">Editar Alumno</a>
+                                                                }
                                                                 </td> 
                                                         </tr>
                                                     }
@@ -154,6 +158,7 @@ else
                                                         <tr>
                                                             <td colspan="2">
                                                                 <a class="btn btn-primary" asp-action="AgregarAlumnoCurso" asp-controller="Alumnos" asp-route-IdCurso="@curso.Id">Agregar Alumno</a>
+
                                                             </td>
                                                         </tr>
                                                     }
