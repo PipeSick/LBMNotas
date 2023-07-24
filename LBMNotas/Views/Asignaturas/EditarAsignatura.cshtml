@@ -1,0 +1,245 @@
+﻿@model AsignaturasEditViewModel
+
+@{
+    ViewData["Title"] = "Editar Asignatura";
+    int index = 1; // Variable para generar un identificador único para cada acordeón
+}
+
+@if (Model.Asignaturas != null)
+{
+    <h2>Detalles de la Asignatura: @Model.Asignaturas.Nombre</h2>
+    <form asp-action="GuardarAsignatura" asp-controller="Asignaturas" method="post">
+        <input class="form-control" hidden asp-for="Asignaturas.Id" />
+
+        <div class="mb-3">
+            <label asp-for="Asignaturas.Nombre" class="form-label">Nombre de la asignatura:</label>
+            <input class="form-control" asp-for="Asignaturas.Nombre" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ListaProfes[0].UserName" class="form-label">Profesor que la dicta:</label>
+            <select class="form-select" asp-for="ListaProfes[0].Id" id="profesdropdown">
+
+                @foreach (var etapa in Model.ListaProfes)
+                {
+                    if (ViewBag.NombreProfe == etapa.UserName)
+                    {
+                        <option value="@etapa.Id" selected>@etapa.UserName</option>
+                    }
+                    else
+                    {
+                        <option value="@etapa.Id">@etapa.UserName</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </form>
+
+    <h2 style="margin-top:15px">Unidades</h2>
+
+    
+     <form asp-action="GuardarUnidadEditada" asp-controller="Asignaturas" method="post">
+    <div class="accordion" id="asignaturaAccordion">
+        @for (int i = 0; i < Model.Unidades.Count; i++)
+        {
+            var unidad = Model.Unidades[i];
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="asignaturaHeading-@i">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#asignaturaCollapse-@i" aria-expanded="false" aria-controls="asignaturaCollapse-@i">
+                        @unidad.Nombre
+                    </button>
+                </h2>
+                <div id="asignaturaCollapse-@i" class="accordion-collapse collapse" aria-labelledby="asignaturaCollapse-@i" data-bs-parent="#asignaturaAccordion">
+                    <div class="accordion-body">
+                        <div class="unidad mb-3">
+                            <input class="form-check" hidden asp-for="Asignaturas.Id" value="@Model.Asignaturas.Id">
+                            <input class="form-control" hidden asp-for="Unidades[i].Id" />
+                            <label for="unidad-@i" class="form-label">Nombre de la unidad:</label>
+                            <input type="text" asp-for="Unidades[i].Nombre" name="Unidades[@i].Nombre" class="form-control" id="unidad-@i" required="required" disabled />
+                            <div class="invalid-feedback">Por favor, ingresa el nombre de la unidad.</div>
+
+                            <label for="descripcion-@i" class="form-label">Descripción de la unidad:</label>
+                                <textarea name="Unidades[@i].Descripcion" asp-for="Unidades[i].Descripcion" class="form-control" id="descripcion-@i" disabled></textarea>
+
+                            @for (int j = 0; j < Model.Unidades[i].Etapas.Count; j++)
+                            {
+                                <div class="etapa mb-3">
+                                    <label for="etapa-@i-@j" class="form-label">Etapa:</label>
+                                        <select asp-for="Unidades[i].Etapas[j].Nombre" name="Unidades[@i].Etapas[@j].Nombre" class="form-control" required="required" disabled>
+                                        <option value="">Seleccionar etapa...</option>
+                                        @foreach (var etapaPredefinida in Model.EtapasPredefinidas)
+                                        {
+                                            <option value="@etapaPredefinida">@etapaPredefinida</option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">Por favor, selecciona una etapa.</div>
+                                    <label for="porcentaje-@i-@j" class="form-label">Porcentaje de la etapa:</label>
+                                        <input type="number" asp-for="Unidades[i].Etapas[j].Porcentaje" name="Unidades[@i].Etapas[@j].Porcentaje" class="form-control" id="porcentaje-@i-@j" required="required" disabled />
+                                </div>
+
+                            }
+
+                                <a type="button" class="btn btn-secondary mt-2" asp-action="EditarUnidadAsignatura" asp-route-IdUnidad="@unidad.Id">Editar Unidad</a>
+                            <button type="button" class="eliminarUnidadBtn btn btn-danger mt-2" data-unidad-id="@unidad.Id" data-asignatura-id="@unidad.AsignaturasID">Eliminar unidad</button>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+    </form>
+    <div class="d-flex justify-content-center mt-3">
+        <a type="button" asp-route-IdAsignatura="@Model.Asignaturas.Id" asp-action="AgregarUnidad" class="btn btn-primary mt-3">Agregar Unidad</a>
+    </div>
+
+    <div id="successModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edición Exitosa</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Los cambios han sido guardados exitosamente.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closemodalbtn" class="btn btn-secondary" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="eliminarUnidadModal" tabindex="-1" aria-labelledby="eliminarUnidadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarUnidadModalLabel">Eliminar Unidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar esta unidad?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="eliminarUnidadConfirmBtn">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agregar un modal para mostrar el mensaje de éxito -->
+    <div class="modal fade" id="eliminarUnidadExitosoModal" tabindex="-1" role="dialog" aria-labelledby="eliminarUnidadExitosoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarUnidadExitosoModalLabel">Éxito</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    La unidad ha sido eliminada exitosamente.
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}
+else
+{
+    <p>No se encontró la asignatura.</p>
+}
+
+
+
+
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Agregar evento de click al botón eliminar
+            $(".eliminarUnidadBtn").click(function () {
+                var unidadId = $(this).data("unidad-id");
+                var asignaturaId = $(this).data("asignatura-id");
+
+                // Guardar los IDs en atributos del modal
+                $("#eliminarUnidadConfirmBtn").data("unidad-id", unidadId);
+                $("#eliminarUnidadConfirmBtn").data("asignatura-id", asignaturaId);
+
+                // Abrir el modal de advertencia
+                $("#eliminarUnidadModal").modal("show");
+            });
+
+            // Agregar evento de click al botón "Eliminar" dentro del modal
+            $("#eliminarUnidadConfirmBtn").click(function () {
+                var unidadId = $(this).data("unidad-id");
+                var asignaturaId = $(this).data("asignatura-id");
+
+                // Realizar la solicitud AJAX al controlador para eliminar la unidad
+                $.ajax({
+                    url: `/Asignaturas/EliminarUnidad?IdUnidad=${unidadId}&IdAsignatura=${asignaturaId}`,
+                    type: "POST", // Puedes cambiar a "GET" o "DELETE" según corresponda en tu controlador
+                    success: function (data) {
+                        // Cerrar el modal
+                        $("#eliminarUnidadModal").modal("hide");
+                        // Mostrar el modal de éxito
+                        $("#eliminarUnidadExitosoModal").modal("show");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000); // 2 segundos de espera antes de recargar la página
+
+
+                        // Aquí puedes hacer alguna acción adicional, como actualizar la lista de unidades.
+                    },
+                    error: function (error) {
+                        // Manejar el error si ocurre
+                        console.log("Error al eliminar la unidad:", error);
+                    }
+                });
+            });
+
+            // Event delegation for form submission
+            $("form").on("submit", function (event) {
+                guardarCambios(event);
+            });
+
+            function agregarEtapa(event) {
+                var unidadIndex = $(event.target).data("unidad-index");
+                var etapaIndex = $(`.unidad:eq(${unidadIndex}) .etapa`).length;
+
+                var etapaHtml = `
+                                    <div class="etapa mb-3">
+                                        <input class="form-control" hidden asp-for="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Id" />
+                                        <label name="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Nombre" asp-for="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Nombre" class="form-label">Nombre de la etapa:</label>
+                                        <select class="form-select" asp-for="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Nombre" id="etapaDropdown-${unidadIndex}-${etapaIndex}">
+        @foreach (var etapaPredefinida in Model.EtapasPredefinidas)
+        {
+                                                        <option value="@etapaPredefinida">@etapaPredefinida</option>
+        }
+                                        </select>
+                                        <label asp-for="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Porcentaje" class="form-label">Porcentaje:</label>
+                                        <input class="form-control" name="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Porcentaje" asp-for="Unidades[${unidadIndex}].Etapas[${etapaIndex}].Porcentaje" />
+                                    </div>`;
+
+                $(event.target).before(etapaHtml);
+            }
+
+            
+
+            // Agregar evento de click al botón "Agregar etapa" (delegated event)
+            $(".accordion").on("click", ".agregarEtapaBtn", agregarEtapa);
+
+            // Agregar evento de submit al formulario para llamar a la función guardarCambios
+            $("form").submit(guardarCambios);
+
+
+        });
+    </script>
+
+
+}

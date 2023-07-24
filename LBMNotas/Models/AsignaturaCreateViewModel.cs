@@ -16,7 +16,7 @@ namespace LBMNotas.Models
 
         public AsignaturaCreateViewModel()
         {
-            EtapasPredefinidas = new List<string> { "Punto de partida y Punto de llegada", "Investigación", "Desarrollo del Pensamiento Complejo", "Relación", "Sustentación" };
+            EtapasPredefinidas = new List<string> { "Punto de partida y Punto de llegada", "Investigación", "Desarrollo del Pensamiento Complejo", "Relación", "Sustentación", "Otro" };
         }
 
     }

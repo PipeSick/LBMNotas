@@ -1,0 +1,131 @@
+﻿@model AgregarUnidadViewModel
+
+@{
+    ViewData["Title"] = "Editar Unidad";
+}
+
+<h1>Editar Unidad</h1>
+
+<hr />
+
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="GuardarUnidadEditada" id="unidadForm" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Unidades.Nombre" class="form-label">Nombre:</label>
+                <input asp-for="Unidades.Nombre" class="form-control" />
+                <span asp-validation-for="Unidades.Nombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Unidades.Descripcion" class="form-label">Descripción:</label>
+                <input asp-for="Unidades.Descripcion" class="form-control" />
+                <span asp-validation-for="Unidades.Descripcion" class="text-danger"></span>
+            </div>
+            <input asp-for="Unidades.AsignaturasID" hidden />
+            <input asp-for="Unidades.Id" hidden />
+
+            <h2>Etapas</h2>
+            <div id="etapasContainer">
+                @for (int i = 0; i < Model.Etapas.Count; i++)
+                {
+                    <div class="etapa mb-3">
+                        <input asp-for="Etapas[i].Id" name="Etapas[@i].Id" hidden/>
+                        <input asp-for="Etapas[i].UnidadesId" hidden/>
+                        <label for="Unidades[0].Etapas[@i].Nombre" class="form-label">Etapa:</label>
+                        <select id="Unidades[0].Etapas[@i].Nombre" asp-for="Etapas[i].Nombre" name="Etapas[@i].Nombre" class="form-control" required>
+                            <option value="">Seleccionar etapa...</option>
+                            @foreach (var etapaPredefinida in Model.EtapasPredefinidas)
+                            {
+                                <option value="@etapaPredefinida">@etapaPredefinida</option>
+                            }
+                        </select>
+                        <div class="invalid-feedback">Por favor, selecciona una etapa.</div>
+                        <label for="Unidades[0].Etapas[@i].Porcentaje" class="form-label">Porcentaje de la etapa:</label>
+                        <input asp-for="Etapas[i].Porcentaje" id="Unidades[0].Etapas[@i].Porcentaje" type="number" name="Etapas[@i].Porcentaje" class="form-control" required />
+                        <button type="button" class="btn btn-danger btn-sm mt-2" data-etapaid="@Model.Etapas[i].Id" onclick="eliminarEtapa(this)">Eliminar Etapa</button>
+                    </div>
+                }
+            </div>
+            <button type="button" id="agregarEtapaBtn" class="btn btn-secondary">Agregar Etapa</button>
+
+            <div class="mb-3" style="margin-top: 15px;">
+                <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Modal de éxito -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Edición Exitosa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Los cambios han sido guardados exitosamente.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Función para agregar una nueva etapa al formulario
+        function agregarEtapa() {
+            var etapaIndex = $(".etapa").length;
+
+            var newEtapa = `
+                    <div class="etapa mb-3">
+                        <label for="Etapas_${etapaIndex}__Nombre" class="form-label">Etapa:</label>
+                        <select name="Etapas[${etapaIndex}].Nombre" class="form-control" required="required">
+                            <option value="">Seleccionar etapa...</option>
+        @foreach (var etapaPredefinida in Model.EtapasPredefinidas)
+        {
+                                    <option value="@etapaPredefinida">@etapaPredefinida</option>
+        }
+                        </select>
+                        <div class="invalid-feedback">Por favor, selecciona una etapa.</div>
+                        <label for="Etapas_${etapaIndex}__Porcentaje" class="form-label">Porcentaje de la etapa:</label>
+                        <input type="number" name="Etapas[${etapaIndex}].Porcentaje" class="form-control" id="porcentaje-${etapaIndex}" required="required" />
+                        <button type="button" class="btn btn-danger btn-sm mt-2" onclick="eliminarEtapa(this)">Eliminar Etapa</button>
+                    </div>`;
+
+            $('#etapasContainer').append(newEtapa);
+        }
+
+        function eliminarEtapa(button) {
+            var etapaId = $(button).data("etapaid");
+
+            // Realizar la solicitud AJAX para eliminar la etapa en el servidor
+            $.ajax({
+                url: "/Asignaturas/EliminarEtapa",
+                type: "POST",
+                data: { id: etapaId },
+                success: function (result) {
+                    // Si la eliminación es exitosa, eliminar la etapa de la vista
+                    $(button).closest(".etapa").remove();
+                },
+                error: function (error) {
+                    // Manejar el error si la eliminación falla
+                    alert("Error al eliminar la etapa.");
+                }
+            });
+        }
+
+        
+        // Manejador de clic del botón "Agregar Etapa"
+        $('#agregarEtapaBtn').on('click', function () {
+            agregarEtapa();
+        });
+    </script>
+}

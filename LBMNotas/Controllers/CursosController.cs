@@ -126,6 +126,14 @@ namespace LBMNotas.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        public async Task<IActionResult> EliminarCurso(int Id)
+        {
+            var cursoeliminado = context.Cursos.Find(Id);
+            context.Cursos.Remove(cursoeliminado);
+            context.SaveChanges();
+            return RedirectToAction("Index", "Home"); 
+        }
+
 
 
 

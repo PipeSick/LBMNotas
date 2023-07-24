@@ -51,7 +51,7 @@
         </div>
 
         <h3 class="mt-4">Unidades:</h3>
-        <div id="unidadesContainer">
+        <div class="unidadesContainer" id="unidadesContainer">
             @for (int i = 0; i < Model.Unidades.Count; i++)            {
                 <div class="unidad mb-3">
                     <label for="unidad-@i" class="form-label">Nombre de la unidad:</label>
@@ -87,7 +87,6 @@
 
         <button type="button" id="agregarUnidadBtn" class="btn btn-primary mt-2">Agregar unidad</button>
 
-        <!-- Resto del código de la vista -->
 
 
     </div>
@@ -105,6 +104,7 @@
         var unidadIndex = @Model.Unidades.Count;
 
         function agregarUnidad() {
+
             var unidadHtml = `<div class="unidad mb-3">
                                 <label for="unidad-${unidadIndex}" class="form-label">Nombre de la unidad:</label>
                                 <input type="text" name="Unidades[${unidadIndex}].Nombre" class="form-control" id="unidad-${unidadIndex}" required="required" />

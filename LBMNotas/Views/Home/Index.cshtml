@@ -27,12 +27,15 @@
         {
             <a asp-action="Index" asp-controller="Cursos" class="btn btn-primary">Agregar Curso</a>
         }
+       
 
     </div>
 }
 else
 {
+    
     <div class="accordion" id="cursosAccordion">
+      
         @foreach (var curso in Model.CursosListado)
         {
         <div class="accordion-item">
@@ -83,9 +86,19 @@ else
                                                             <td style="text-align:end">
                                                                 <a class="btn btn-primary" asp-action="AsignaturasIndex" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id" asp-route-IdCurso="@curso.Id"> Ver Notas Por Unidades</a>
                                                                 <a class="btn btn-success" asp-action="VistaNotasFinalesUnidad" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id" asp-route-IdCurso="@curso.Id">Ver Notas Finales</a>
-                                                             </td> <!-- Icono de tuerca de Material Design -->
+                                                                @if (User.IsInRole("admin"))
+                                                                {
+                                                                    <a class="btn btn-primary" asp-action="EditarAsignatura" asp-controller="Asignaturas" asp-route-IdAsignatura="@asignaturas.Id" asp-route-IdCurso="@curso.Id">Editar Asignatura</a>
+                                                                    <a class="btn btn-danger" onclick="mostrarModalConfirmacion(@asignaturas.Id)">Eliminar Asignatura</a>
+
+                                                                }
+
+                                                                    
+                                                                 
+                                                             </td>
 
                                                         </tr>
+
                                                     }
                                                 </tbody>
                                                 <tfoot>
@@ -172,7 +185,15 @@ else
                         </div>
                     </div>
                 </div>
+                @if (User.IsInRole("admin"))
+                    {
+                        <div class="d-flex justify-content-end" style="margin-right:20px; margin-bottom:10px">
+                            <a class="btn btn-danger" onclick="mostrarModalConfirmacion2(@curso.Id)"> Eliminar Curso</a>
+                        </div>
+                    }
+
             </div>
+
         </div>
             index++; // Incrementar el índice único para el siguiente acordeón
         }
@@ -184,12 +205,49 @@ else
         </div>
     }
 
+    
 
 }
 
+<div class="modal modal-above-accordion" id="confirmDeleteModal" tabindex="-2" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="close" id="cancelModal1" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar esta asignatura?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a id="btnEliminarAsignatura" class="btn btn-danger" href="#">Eliminar</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal modal-above-accordion2" id="confirmDeleteModal2" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel2" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel2">Confirmar Eliminación</h5>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este curso?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a id="btnEliminarCurso" class="btn btn-danger" href="#">Eliminar</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <style>
     /* Estilos para el formulario */
+
     .filter-form {
         position: sticky;
         top: 0;
@@ -198,7 +256,7 @@ else
         padding: 10px;
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        z-index: 9999;
+        z-index: 1000;
         margin-top: 40px; /* Ajusta el valor según la altura de tu barra de navegación */
     }
     .filter-form label {
@@ -221,9 +279,25 @@ else
             cursor: pointer;
         }
 
-            .filter-form button:hover {
+    .filter-form button:hover {
                 background-color: #0056b3;
             }
+
+    .modal-above-accordion {
+        position: fixed; /* Cambiar el posicionamiento a "fixed" */
+        z-index: 1052;
+        top: 50%; /* Ajustar la posición vertical */
+        left: 50%; /* Ajustar la posición horizontal */
+        transform: translate(-50%, -50%); /* Centrar el modal */
+    }
+
+    .modal-above-accordion2 {
+        position: fixed; /* Cambiar el posicionamiento a "fixed" */
+        z-index: 1051;
+        top: 50%; /* Ajustar la posición vertical */
+        left: 50%; /* Ajustar la posición horizontal */
+        transform: translate(-50%, -50%); /* Centrar el modal */
+    }
 </style>
 
 <script>
@@ -232,4 +306,15 @@ else
         var selectedOption = select.options[select.selectedIndex].text;
         localStorage.setItem("selectedOption", selectedOption);
     }
+    function mostrarModalConfirmacion(idAsignatura) {
+        var modal = $("#confirmDeleteModal");
+        modal.find("#btnEliminarAsignatura").attr("href", "/Asignaturas/EliminarAsignatura/" + idAsignatura);
+        modal.modal("show");
+    }
+    function mostrarModalConfirmacion2(IdCurso) {
+        var modal = $("#confirmDeleteModal2");
+        modal.find("#btnEliminarCurso").attr("href", "/Cursos/EliminarCurso/" + IdCurso);
+        modal.modal("show");
+    }
+   
 </script>
