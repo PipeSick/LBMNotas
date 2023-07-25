@@ -12,7 +12,7 @@ namespace LBMNotas.Models
         public List<IdentityUser> ListaProfes { get; set; }
         public AsignaturasEditViewModel()
         {
-            EtapasPredefinidas = new List<string> { "Punto de partida y Punto de llegada", "Investigación", "Desarrollo del Pensamiento Complejo", "Relación", "Sustentación" };
+            EtapasPredefinidas = new List<string> { "Punto de partida y Punto de llegada", "Investigación", "Desarrollo del Pensamiento Complejo", "Relación", "Sustentación","Otro" };
         }
     }
 }

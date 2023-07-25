@@ -6,6 +6,19 @@
 
 <h1>Agregar Unidad</h1>
 
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <span>@error.ErrorMessage</span>
+
+            <br />
+        }
+    </div>
+}
+
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -60,31 +73,31 @@
 
 @section Scripts {
     <script>
-        // Función para agregar una nueva etapa al formulario
+        var etapasCount = 0;
         function agregarEtapa() {
             var accordionItem = $(event.target).closest(".accordion-item");
-            var unidadIndex = accordionItem.index();
+            var unidadIndex = 0;
             var etapaIndex = accordionItem.find(".etapa").length;
 
             var newEtapa = `
-                        <div class="etapa mb-3">
-                            <label for="etapa-${etapasCount}" class="form-label">Etapa:</label>
-                                    <select name="Etapas[${etapasCount}].Nombre" class="form-control" required="required">
-                                <option value="">Seleccionar etapa...</option>
+                    <div class="etapa mb-3">
+                        <label for="etapa-${etapasCount}" class="form-label">Etapa:</label>
+                                <select asp-for="Unidades.Etapas[${etapasCount}].Nombre" name="Unidades.Etapas[${etapasCount}].Nombre" class="form-control" required>
+                            <option value="">Seleccionar etapa...</option>
         @foreach (var etapaPredefinida in Model.EtapasPredefinidas)
         {
-                                            <option value="@etapaPredefinida">@etapaPredefinida</option>
+                                    <option value="@etapaPredefinida">@etapaPredefinida</option>
         }
-                            </select>
-                            <div class="invalid-feedback">Por favor, selecciona una etapa.</div>
-                            <label for="porcentaje-${etapasCount}" class="form-label">Porcentaje de la etapa:</label>
-                            <input type="number" name="Etapas[${etapasCount}].Porcentaje" class="form-control" id="porcentaje-${etapasCount}" required="required" />
-                            <button type="button" class="btn btn-danger btn-sm mt-2" onclick="eliminarEtapa(this)">Eliminar Etapa</button>
-                        </div>`;
+                        </select>
+                        <div class="invalid-feedback">Por favor, selecciona una etapa.</div>
+                        <label for="porcentaje-${etapasCount}" class="form-label">Porcentaje de la etapa:</label>
+                                <input type="number" asp-for="Unidades.Etapas[${etapasCount}].Porcentaje" name="Unidades.Etapas[${etapasCount}].Porcentaje" class="form-control" id="porcentaje-${etapasCount}" required />
+                        <button type="button" class="btn btn-danger btn-sm mt-2" onclick="eliminarEtapa(this)">Eliminar Etapa</button>
+                    </div>`;
 
+            etapasCount++; // Incrementar el contador de etapas
             $('#etapasContainer').append(newEtapa);
         }
-
 
         // Función para eliminar una etapa del formulario
         function eliminarEtapa(btn) {

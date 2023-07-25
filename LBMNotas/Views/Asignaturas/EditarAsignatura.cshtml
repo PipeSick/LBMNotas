@@ -22,14 +22,19 @@
 
                 @foreach (var etapa in Model.ListaProfes)
                 {
-                    if (ViewBag.NombreProfe == etapa.UserName)
-                    {
-                        <option value="@etapa.Id" selected>@etapa.UserName</option>
-                    }
-                    else
-                    {
-                        <option value="@etapa.Id">@etapa.UserName</option>
-                    }
+
+                    
+                        if (ViewBag.NombreProfe == etapa.UserName)
+                        {
+                            <option value="@etapa.Id" selected>@etapa.UserName</option>
+                        }
+                        else
+                        {
+                            <option value="@etapa.Id">@etapa.UserName</option>
+                        }
+
+                    
+
                 }
             </select>
         </div>
@@ -39,63 +44,80 @@
 
     <h2 style="margin-top:15px">Unidades</h2>
 
-    
-     <form asp-action="GuardarUnidadEditada" asp-controller="Asignaturas" method="post">
-    <div class="accordion" id="asignaturaAccordion">
-        @for (int i = 0; i < Model.Unidades.Count; i++)
-        {
-            var unidad = Model.Unidades[i];
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="asignaturaHeading-@i">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#asignaturaCollapse-@i" aria-expanded="false" aria-controls="asignaturaCollapse-@i">
-                        @unidad.Nombre
-                    </button>
-                </h2>
-                <div id="asignaturaCollapse-@i" class="accordion-collapse collapse" aria-labelledby="asignaturaCollapse-@i" data-bs-parent="#asignaturaAccordion">
-                    <div class="accordion-body">
-                        <div class="unidad mb-3">
-                            <input class="form-check" hidden asp-for="Asignaturas.Id" value="@Model.Asignaturas.Id">
-                            <input class="form-control" hidden asp-for="Unidades[i].Id" />
-                            <label for="unidad-@i" class="form-label">Nombre de la unidad:</label>
-                            <input type="text" asp-for="Unidades[i].Nombre" name="Unidades[@i].Nombre" class="form-control" id="unidad-@i" required="required" disabled />
-                            <div class="invalid-feedback">Por favor, ingresa el nombre de la unidad.</div>
+    @if (Model.Unidades.Count != 0)
+    {
+        <form asp-action="GuardarUnidadEditada" asp-controller="Asignaturas" method="post">
+            <div class="accordion" id="asignaturaAccordion">
+                @for (int i = 0; i < Model.Unidades.Count; i++)
+                {
+                    var unidad = Model.Unidades[i];
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="asignaturaHeading-@i">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#asignaturaCollapse-@i" aria-expanded="false" aria-controls="asignaturaCollapse-@i">
+                                @unidad.Nombre
+                            </button>
+                        </h2>
+                        <div id="asignaturaCollapse-@i" class="accordion-collapse collapse" aria-labelledby="asignaturaCollapse-@i" data-bs-parent="#asignaturaAccordion">
+                            <div class="accordion-body">
+                                <div class="unidad mb-3">
+                                    <input class="form-check" hidden asp-for="Asignaturas.Id" value="@Model.Asignaturas.Id">
+                                    <input class="form-control" hidden asp-for="Unidades[i].Id" />
+                                    <label for="unidad-@i" class="form-label">Nombre de la unidad:</label>
+                                    <input type="text" asp-for="Unidades[i].Nombre" name="Unidades[@i].Nombre" class="form-control" id="unidad-@i" required="required" disabled />
+                                    <div class="invalid-feedback">Por favor, ingresa el nombre de la unidad.</div>
 
-                            <label for="descripcion-@i" class="form-label">Descripción de la unidad:</label>
-                                <textarea name="Unidades[@i].Descripcion" asp-for="Unidades[i].Descripcion" class="form-control" id="descripcion-@i" disabled></textarea>
+                                    <label for="descripcion-@i" class="form-label">Descripción de la unidad:</label>
+                                    <textarea name="Unidades[@i].Descripcion" asp-for="Unidades[i].Descripcion" class="form-control" id="descripcion-@i" disabled></textarea>
 
-                            @for (int j = 0; j < Model.Unidades[i].Etapas.Count; j++)
-                            {
-                                <div class="etapa mb-3">
-                                    <label for="etapa-@i-@j" class="form-label">Etapa:</label>
-                                        <select asp-for="Unidades[i].Etapas[j].Nombre" name="Unidades[@i].Etapas[@j].Nombre" class="form-control" required="required" disabled>
-                                        <option value="">Seleccionar etapa...</option>
-                                        @foreach (var etapaPredefinida in Model.EtapasPredefinidas)
+                                    @if (Model.Unidades[i].Etapas == null)
+                                    {
+                                        <div>
+                                            <h3 style="margin:10px">Aún no se han agregado etapas.</h3>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        @for (int j = 0; j < Model.Unidades[i].Etapas.Count; j++)
                                         {
-                                            <option value="@etapaPredefinida">@etapaPredefinida</option>
+                                            <div class="etapa mb-3">
+                                                <label for="etapa-@i-@j" class="form-label">Etapa:</label>
+                                                <select asp-for="Unidades[i].Etapas[j].Nombre" name="Unidades[@i].Etapas[@j].Nombre" class="form-control" required="required" disabled>
+                                                    <option value="">Seleccionar etapa...</option>
+                                                    @foreach (var etapaPredefinida in Model.EtapasPredefinidas)
+                                                    {
+                                                        <option value="@etapaPredefinida">@etapaPredefinida</option>
+                                                    }
+                                                </select>
+                                                <div class="invalid-feedback">Por favor, selecciona una etapa.</div>
+                                                <label for="porcentaje-@i-@j" class="form-label">Porcentaje de la etapa:</label>
+                                                <input type="number" asp-for="Unidades[i].Etapas[j].Porcentaje" name="Unidades[@i].Etapas[@j].Porcentaje" class="form-control" id="porcentaje-@i-@j" required="required" disabled />
+                                            </div>
+
                                         }
-                                    </select>
-                                    <div class="invalid-feedback">Por favor, selecciona una etapa.</div>
-                                    <label for="porcentaje-@i-@j" class="form-label">Porcentaje de la etapa:</label>
-                                        <input type="number" asp-for="Unidades[i].Etapas[j].Porcentaje" name="Unidades[@i].Etapas[@j].Porcentaje" class="form-control" id="porcentaje-@i-@j" required="required" disabled />
+                                    }
+
+                                    <div class="d-flex justify-content-center">
+                                        <a type="button" class="btn btn-secondary mt-2 m-2" asp-action="EditarUnidadAsignatura" asp-route-IdUnidad="@unidad.Id">Editar Unidad</a>
+                                        <button type="button" class="eliminarUnidadBtn btn btn-danger mt-2 m-2" data-unidad-id="@unidad.Id" data-asignatura-id="@unidad.AsignaturasID">Eliminar unidad</button>
+                                    </div>
                                 </div>
-
-                            }
-
-                                <a type="button" class="btn btn-secondary mt-2" asp-action="EditarUnidadAsignatura" asp-route-IdUnidad="@unidad.Id">Editar Unidad</a>
-                            <button type="button" class="eliminarUnidadBtn btn btn-danger mt-2" data-unidad-id="@unidad.Id" data-asignatura-id="@unidad.AsignaturasID">Eliminar unidad</button>
-
+                            </div>
                         </div>
-                    </div>
-                </div>
 
+                    </div>
+                }
             </div>
-        }
-    </div>
-    </form>
+        </form>
+    }else
+    {
+        <p><strong><em>Aún no se han agregado unidades a la asignatura seleccionada.</em></strong> </p>
+    }
+
     <div class="d-flex justify-content-center mt-3">
         <a type="button" asp-route-IdAsignatura="@Model.Asignaturas.Id" asp-action="AgregarUnidad" class="btn btn-primary mt-3">Agregar Unidad</a>
     </div>
 
+    <!--Modal de que los cambios de guardaron correctamente-->
     <div id="successModal" class="modal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -111,6 +133,8 @@
             </div>
         </div>
     </div>
+
+    <!--Modal de advertencia sobre eliminar unidad-->
     <div class="modal" id="eliminarUnidadModal" tabindex="-1" aria-labelledby="eliminarUnidadModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

@@ -83,6 +83,14 @@ namespace LBMNotas.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (model.Unidades == null || model.Unidades.All(u => u.Etapas == null))
+                {
+                    ModelState.AddModelError("", "Debe agregar al menos una unidad y una etapa.");
+                    var listaprofes = userManager.GetUsersInRoleAsync("profesor");
+                    model.ListaProfes = listaprofes.Result.Select(u=> u).ToList();
+                    return View(model);
+                }
+
                 var nuevaAsignatura = new Asignaturas
                 {
                  
@@ -179,8 +187,15 @@ namespace LBMNotas.Controllers
             //se obtienen los datos de la asignatura.
             var AsignaturaDatos = context.Asignaturas.Where(a => a.Id == IdAsignatura).FirstOrDefault();
             var idprofe = context.ProfesorAsignatura.Where(p => p.AsignaturasId ==  IdAsignatura).FirstOrDefault();
-            var datosprofe = context.Users.Where(pa => pa.Id == idprofe.UserId).FirstOrDefault();
-
+            if (idprofe != null)
+            {
+                var datosprofe = context.Users.Where(pa => pa.Id == idprofe.UserId).FirstOrDefault();
+                ViewBag.NombreProfe = datosprofe.UserName;
+            }
+            else
+            {
+                ViewBag.NombreProfe = "Sin Asignar";
+            }
             //se obtienen la lista de unidades que posee la asignatura
             var ListaUnidades = context.Unidades.Where(u => u.AsignaturasID == IdAsignatura).ToList();
             //se crea una nueva lista de etapas.
@@ -200,7 +215,7 @@ namespace LBMNotas.Controllers
             {
                 return NotFound();
             }
-            ViewBag.NombreProfe = datosprofe.UserName;
+
             var listaprofes = userManager.GetUsersInRoleAsync("profesor");
             modelo.ListaProfes = listaprofes.Result.Select(u => u).ToList();
             modelo.Asignaturas = AsignaturaDatos;
@@ -259,8 +274,13 @@ namespace LBMNotas.Controllers
             var idasignatura = nuevaunidad.IdAsignatura;
             if (ModelState.IsValid)
             {
-                
-                    var UnidadAgregar = new Unidades
+                if (nuevaunidad.Unidades == null || nuevaunidad.Unidades.Etapas == null)
+                {
+                    ModelState.AddModelError("", "Debe agregar al menos una unidad y una etapa.");
+                    return View(nuevaunidad);
+                }
+
+                var UnidadAgregar = new Unidades
                     {
                         Nombre = nuevaunidad.Unidades.Nombre,
                         Descripcion = nuevaunidad.Unidades.Descripcion,
@@ -271,7 +291,7 @@ namespace LBMNotas.Controllers
                     context.Unidades.Add(UnidadAgregar);
                     context.SaveChanges();
 
-                    foreach (var etapa in nuevaunidad.Etapas)
+                    foreach (var etapa in nuevaunidad.Unidades.Etapas)
                     {
                         var EtapasAgregar = new Etapas
                         {
@@ -281,13 +301,10 @@ namespace LBMNotas.Controllers
                         };
                         context.Etapas.Add(EtapasAgregar);
                     }
-                    context.SaveChanges();       
-              
-
+                    context.SaveChanges();
+                return RedirectToAction("EditarAsignatura", new { IdAsignatura = idasignatura });
             }
-
-            return RedirectToAction("EditarAsignatura", new { IdAsignatura = idasignatura });
-            
+            return View(nuevaunidad);            
         }
 
         public IActionResult EliminarUnidad(int IdUnidad, int IdAsignatura)
@@ -323,6 +340,11 @@ namespace LBMNotas.Controllers
         [HttpPost]
         public IActionResult GuardarUnidadEditada(AgregarUnidadViewModel modelo)
         {
+            if (modelo.Etapas == null)
+            {
+                ModelState.AddModelError("", "Debe agregar al menos una unidad y una etapa.");
+                return View("EditarUnidadAsignatura", modelo);
+            }
             var idAsignatura = modelo.Unidades.AsignaturasID;
             bool cambiosGuardados = false;
             var unidadeditada = context.Unidades.Find(modelo.Unidades.Id);
@@ -341,6 +363,7 @@ namespace LBMNotas.Controllers
                         etapaeditada.Porcentaje = etapa.Porcentaje;
                         etapaeditada.UnidadesId = modelo.Unidades.Id;
                         context.Etapas.Update(etapaeditada);
+
                     cambiosGuardados = true;
                 }
                     else
