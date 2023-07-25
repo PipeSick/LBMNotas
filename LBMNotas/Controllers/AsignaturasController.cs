@@ -90,17 +90,25 @@ namespace LBMNotas.Controllers
                     model.ListaProfes = listaprofes.Result.Select(u=> u).ToList();
                     return View(model);
                 }
+                foreach (var comprobar in model.Unidades)
+                {
+                    if (comprobar.Etapas == null)
+                    {
+                        ModelState.AddModelError("", "Las unidades deben tener por lo menos 1 etapa.");
+                        var listaprofes = userManager.GetUsersInRoleAsync("profesor");
+                        model.ListaProfes = listaprofes.Result.Select(u => u).ToList();
+                        return View(model);
+                    }
 
+                }
                 var nuevaAsignatura = new Asignaturas
                 {
-                 
+                                    
                     Nombre = model.nombreasignatura,
                     CursosId = model.CursoId
                 };
 
                 context.Asignaturas.Add(nuevaAsignatura);
-                context.SaveChanges();
-
                 var profeasignatura = new ProfesorAsignatura
                 {
                     AsignaturasId = nuevaAsignatura.Id,
@@ -108,7 +116,6 @@ namespace LBMNotas.Controllers
                 };
 
                 context.ProfesorAsignatura.Add(profeasignatura);
-                context.SaveChanges();
                 foreach (var unidadViewModel in model.Unidades)
                 {
                     var nuevaUnidad = new Unidades
@@ -120,8 +127,7 @@ namespace LBMNotas.Controllers
                     };
 
                     context.Unidades.Add(nuevaUnidad);
-                    context.SaveChanges();
-
+                    
                     foreach (var etapaViewModel in unidadViewModel.Etapas)
                     {
                         var nuevaEtapa = new Etapas
